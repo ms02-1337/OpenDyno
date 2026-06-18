@@ -1,0 +1,28 @@
+[Unit]
+Description=OpenDyno Web Server
+After=network.target
+
+[Service]
+# Run as a dedicated, unprivileged system user for security
+User=opendyno
+Group=opendyno
+
+# The application should be placed in /opt/OpenDyno
+WorkingDirectory=/opt/OpenDyno/DynoServer
+
+# Use gunicorn with gevent-websocket worker for stable WebSocket support in production
+ExecStart=/opt/OpenDyno/venv/bin/gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 --bind 0.0.0.0:9000 run:app
+
+Restart=always
+RestartSec=5
+
+# Set environment variable to indicate production environment
+Environment=FLASK_ENV=production
+
+# Logging
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=opendyno
+
+[Install]
+WantedBy=multi-user.target

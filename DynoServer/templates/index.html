@@ -1,0 +1,661 @@
+{% extends "base.html" %}
+{% block headers %}
+
+<!-- Index page custom styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app/index.css')}}">
+<!-- uPlot: lightweight charting library for real-time data visualization -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/vendor/uPlot/uPlot.min.css')}}">
+
+<!-- uPlot library for performance-critical real-time charting -->
+<script src="{{ url_for('static', filename='js/uPlot.iife.js') }}"></script>
+{% endblock %}
+{% block content %}
+
+<!-- Main content area: chart and data display on left, controls on right -->
+<div class="row">
+
+    <!-- Left Column: Live chart and real-time data cards (80% width) -->
+    <div class="col-10 d-flex flex-column">
+        <div class="p-2 border bg-light flex-grow-1 d-flex flex-column" style="overflow: hidden;">
+            <!-- Row 1: Real-time uPlot chart (torque, speed, power vs. time) -->
+            <div class="row flex-grow-1" style="min-height: 0;"> <!-- Added min-height: 0 for proper flex sizing -->
+                <div class="col-12 h-100 pb-2 mr-2 ml-2"> <!-- Added padding here -->
+                    <div id="chart-container" class="h-100 w-100" style="position: relative;">
+                        <div id="chart" class="h-100 w-100"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- End row for chart -->
+            <!-- Row 2: Real-time data cards (4 columns x 2 cards each) -->
+            <div class="row flex-grow-1 flex-wrap gx-3" style="min-height: 100px; max-height: 350px;">
+                <!-- Column 1: System info and time elapsed -->
+                <div class="col d-flex flex-column" style="height: 100%; gap: 0.5rem;">
+                    <!-- Information -->
+                    <div class="card text-white bg-dark text-center" style="flex: 1 1 50%; min-height: 0;">
+                        <div class="card-header fw-bold"><i class="bi bi-info-circle"></i> Information</div>
+                        <div class="card-body d-flex flex-column justify-content-center px-3"
+                            style="font-size: clamp(1rem, 2vmin + 0.75rem, 1.75rem);">
+                            <span id="info-live" class="badge text-bg-danger text-wrap d-inline-block w-100"
+                                style="padding: 0.5em 0.6em; font-size: inherit; word-break: break-word; line-height: 1.5;">Waiting
+                                DynoLogic...</span>
+                        </div>
+                    </div>
+
+                    <!-- Time elapsed -->
+                    <div class="card text-white bg-dark text-center" style="flex: 1 1 50%; min-height: 0;">
+                        <div class="card-header fw-bold"><i class="bi bi-clock"></i> Time Elapsed</div>
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h1 id="time-elapsed" class="display-6 fw-bold" style="font-size: calc(1rem + 3vh);">-</h1>
+                            <span class="fs-5 text-white ms-2">seconds</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Power and torque (live values) -->
+                <div class="col d-flex flex-column" style="height: 100%; gap: 0.5rem;">
+                    <!-- Power -->
+                    <div class="card text-white bg-dark text-center" style="flex: 1 1 50%; min-height: 0;">
+                        <div class="card-header fw-bold"><i class="bi bi-arrow-repeat"></i> Power</div>
+                        <div class="card-body d-flex flex-column justify-content-center"
+                            style="font-size: calc(1rem + 2vh);">
+                            <h1 class="display-6 fw-bold" style="font-size: calc(1rem + 3vh);" id="power_value">-
+                            </h1>
+                            <span class="fs-5 text-white ms-2" id="power-unit-label">kW</span>
+                        </div>
+                    </div>
+                    <!-- Torque -->
+                    <div class="card text-white bg-dark text-center" style="flex: 1 1 50%; min-height: 0;">
+                        <div class="card-header fw-bold" data-bs-toggle="tooltip"
+                            title="Compensated motor torque: motor load-cell torque + inertia term (J*alpha)."><i
+                                class="bi bi-box-arrow-down"></i> Torque</div>
+                        <div class="card-body d-flex flex-column justify-content-center"
+                            style="font-size: calc(1rem + 2vh);">
+                            <h1 class="display-6 fw-bold" style="font-size: calc(1rem + 3vh);" id="torque_value">-
+                            </h1>
+                            <span class="fs-5 text-white ms-2">Nm</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Column 3: Motor speed and max speed -->
+                <div class="col d-flex flex-column" style="height: 100%; gap: 0.5rem;">
+                    <!-- Motor speed -->
+                    <div class="card text-white bg-dark text-center" style="flex: 1 1 50%; min-height: 0;">
+                        <div class="card-header fw-bold"><i class="bi bi-speedometer"></i> Speed</div>
+                        <div class="card-body d-flex flex-column justify-content-center"
+                            style="font-size: calc(1rem + 2vh);">
+                            <h1 id="motor-speed" class="display-6 fw-bold" style="font-size: calc(1rem + 3vh);">-</h1>
+                            <span class="fs-5 text-white ms-2">RPM</span>
+                        </div>
+                    </div>
+                    <!-- Max motor speed -->
+                    <div class="card text-white bg-dark text-center" style="flex: 1 1 50%; min-height: 0;">
+                        <div class="card-header fw-bold"><i class="bi bi-arrow-bar-up"></i> Max Speed</div>
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h1 id="max-motor-speed" class="fw-bold" style="font-size: calc(1rem + 3vh);">-</h1>
+                            <span class="fs-5 text-white ms-2">RPM</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Column 4: Max power and max torque (running peak values) -->
+                <div class="col d-flex flex-column" style="height: 100%; gap: 0.5rem;">
+                    <!-- Max power -->
+                    <div class="card text-white bg-dark text-center" style="flex: 1 1 50%; min-height: 0;">
+                        <div class="card-header fw-bold"><i class="bi bi-arrow-bar-up"></i> Max power</div>
+                        <div class="card-body d-flex flex-column justify-content-center"
+                            style="font-size: calc(1rem + 2vh);">
+                            <h1 class="display-6 fw-bold" style="font-size: calc(1rem + 3vh);" id="max-power">-</h1>
+                            <span class="fs-5 text-white ms-2" id="max-power-rpm">kW @ - RPM</span>
+                        </div>
+                    </div>
+                    <!-- Max torque -->
+                    <div class="card text-white bg-dark text-center" style="flex: 1 1 50%; min-height: 0;">
+                        <div class="card-header fw-bold"><i class="bi bi-arrow-bar-up"></i> Max Torque</div>
+                        <div class="card-body d-flex flex-column justify-content-center"
+                            style="font-size: calc(1rem + 2vh);">
+                            <h1 id="max-torque" class="display-6 fw-bold" style="font-size: calc(1rem + 3vh);">-</h1>
+                            <span class="fs-5 text-white ms-2" id="max-torque-rpm">Nm @ - RPM</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- End row for cards -->
+        </div>
+    </div>
+
+    <!-- Right Column: Control panel and quick configuration (20% width) -->
+    <div class="col-2 bg-dark" style="height: calc(100vh - 62px); display: flex; flex-direction: column;">
+        <!-- Section 1: Control header showing current mode -->
+        <h4 class="text-center text-white fw-bold bg-dark pt-2 pb-2 mb-0"
+            style="border-bottom: 2px solid #F0B823; border-top: 2px solid #F0B823;">
+            Control
+        </h4>
+        <h5 class="text-center text-white bg-dark pt-3 pb-1 mb-0" id="current-mode">
+            -
+        </h5>
+        <!-- Test control buttons: Run, Reset, Save -->
+        <div class="d-flex justify-content-between align-items-center p-2 gap-2 bg-dark mb-2 mt-2">
+            <!-- Run Test Button -->
+            <button id="run-test" type="button" class="btn btn-success w-100">Run</button>
+            <!-- Reset Button -->
+            <button id="reset-test" type="button" class="btn btn-warning w-100"><i class="bi bi-recycle"></i>
+                Reset</button>
+            <!-- Save Test Button -->
+            <button id="save-test" type="button" class="btn btn-warning w-100" data-bs-toggle="modal"
+                data-bs-target="#saveTestModal">
+                <i class="bi bi-floppy-fill"></i> Save
+            </button>
+        </div>
+
+        <!-- Section 2: Fast Configuration Accordions -->
+        <h4 class="text-center text-white fw-bold"
+            style="border-bottom: 2px solid #F0B823; border-top: 2px solid #F0B823; padding-top: 8px; padding-bottom: 8px; margin-bottom: 0; position: sticky; top: 80px;">
+            Fast Configuration
+        </h4>
+
+        <!-- Scrollable accordion list for quick parameter adjustments -->
+        <div class="accordion accordion-flush" id="accordionFlushExample" data-bs-theme="dark"
+            style="flex-grow: 1; overflow-y: auto; padding-top: 8px;">
+            <!-- Accordion 1: Run mode selection (Dynamic/Speed/Torque) and setpoint value -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+                        <i class="bi bi-speedometer me-2"></i>Run Mode
+                    </button>
+                </h2>
+                <div id="flush-collapseThree" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="form-group">
+                            <label for="startSpeed" class="fw-bold">Mode</label>
+                            <select class="form-control" id="mode-input" data-bs-toggle="tooltip"
+                                title="Select the test run mode (Dynamic, Speed, or Torque)">
+                                <option>Dynamic</option>
+                                <option>Speed</option>
+                                <option>Torque</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="mode-value-form">
+                            <label for="endSpeed" class="fw-bold">Value</label>
+                            <input type="number" class="form-control" id="mode-value-input"
+                                aria-describedby="endSpeedHelp" placeholder="End speed" data-bs-toggle="tooltip"
+                                title="Set the target value for the selected mode">
+                            <small id="end-speed-help" class="form-text text-muted">Torque in Nm.
+                                Speed in rpm. Dynamic in RPM/s.</small>
+                        </div>
+                        <div class="form-group mt-2">
+                            <input type="range" class="form-range" id="mode-value-range" min="0" max="1000" step="1">
+                        </div>
+                        <button id="save-run-mode" class="btn btn-primary center" style="width: 100%;"><i
+                                class="bi bi-floppy-fill"></i> Save</button>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Accordion 2: Dyno configuration (start speed, end speed, ramp rate) -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                        <i class="bi bi-sliders me-2"></i>Dyno Configuration
+                    </button>
+                </h2>
+                <div id="flush-collapseOne" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="container">
+                            <div class="form-group">
+                                <label for="startSpeed" class="fw-bold">Start Run Speed (RPM)</label>
+                                <input type="number" class="form-control" id="start-speed-input"
+                                    aria-describedby="startSpeedHelp" placeholder="Start speed" data-bs-toggle="tooltip"
+                                    title="Initial speed to begin the dyno run (minimum 500 RPM recommended)">
+                                <small class="form-text text-muted">Current: </small><small class="fw-bold"
+                                    id="current-start-speed">-
+                                    rpm</small><br>
+                                <small id="startSpeedHelp" class="form-text text-muted">Minimum recommended: 500
+                                    RPM</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="endSpeed" class="fw-bold">End Run Speed (RPM)</label>
+                                <input type="number" class="form-control" id="end-speed-input"
+                                    aria-describedby="endSpeedHelp" placeholder="End speed" data-bs-toggle="tooltip"
+                                    title="Final speed to end the dyno run (maximum 4500 RPM)">
+                                <small class="form-text text-muted">Current: </small><small class="fw-bold"
+                                    id="current-end-speed">-
+                                    rpm</small><br>
+                            </div>
+                            <div class="form-group">
+                                <label for="rampRate" class="fw-bold">Ramp Rate (RPM/s)</label>
+                                <input type="number" class="form-control" id="ramp-rate-input"
+                                    aria-describedby="rampRateHelp" placeholder="Ramp rate" data-bs-toggle="tooltip"
+                                    title="Acceleration rate in RPM per second (50-200 RPM/s recommended)">
+                                <small class="form-text text-muted">Current: </small><small class="fw-bold"
+                                    id="current-ramp-rate">-
+                                    RPM/s</small><br>
+                                <small id="rampRateHelp" class="form-text text-muted">Recommended: 50-200
+                                    RPM/s</small>
+                            </div>
+                            <button id="save-dyno-config" class="btn btn-primary center" style="width: 100%;"><i
+                                    class="bi bi-floppy-fill"></i> Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Accordion 3: Motor ratio (sprocket teeth for gear calculation) -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="#flush-collapseTwo">
+                        <i class="bi bi-gear-wide-connected me-2"></i>Motor Ratio
+                    </button>
+                </h2>
+                <div id="flush-collapseTwo" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="container">
+                            <div class="form-group">
+                                <label for="startSpeed" class="fw-bold">Motor Sprocket Teeth</label>
+                                <input type="number" class="form-control" id="motor-pinions-input"
+                                    aria-describedby="startSpeedHelp" placeholder="Motor pinions"
+                                    data-bs-toggle="tooltip" title="Number of teeth on the motor sprocket">
+                                <small id="startSpeedHelp" class="form-text text-muted">Number of teeth</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="endSpeed" class="fw-bold">Dyno Sprocket Teeth</label>
+                                <input type="number" class="form-control" id="dyno-pinions-input"
+                                    aria-describedby="endSpeedHelp" placeholder="Dyno pinions" data-bs-toggle="tooltip"
+                                    title="Number of teeth on the dyno sprocket">
+                                <small class="form-text text-muted">Number of teeth</small>
+                            </div>
+                            <button id="save-motor-ratio" class="btn btn-primary center" style="width: 100%;"><i
+                                    class="bi bi-floppy-fill"></i> Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Accordion 4: Graph configuration button (opens modal) -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" id="graphConfigButton"
+                        data-bs-toggle="modal" data-bs-target="#graphConfigModal">
+                        <i class="bi bi-graph-up me-2"></i>Graph Configuration
+                    </button>
+                </h2>
+            </div>
+        </div>
+
+        <!-- Section 3: Collapsible status bar with additional measurements -->
+        <!-- Toggle button to show/hide status bar -->
+        <div id="sidebar-status-toggle" class="d-flex justify-content-center p-1" style="background:transparent;">
+            <button id="sidebar-toggle-btn" class="btn btn-sm btn-light" aria-expanded="false"
+                aria-controls="sidebar-status" title="Show/Hide status">
+                <i id="sidebar-toggle-icon" class="bi bi-chevron-up"></i>
+            </button>
+        </div>
+        <div id="sidebar-status" class="p-2 collapsed">
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="card bg-dark text-white small-card text-center border-custom">
+                        <div class="card-header fw-bold">PWM</div>
+                        <div class="card-body"><span id="pwm-value" class="value">- %</span></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="card bg-dark text-white small-card text-center border-custom">
+                        <div class="card-header fw-bold">Brake Speed</div>
+                        <div class="card-body"><span id="brake-speed-value" class="value">- RPM</span></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="card bg-dark text-white small-card text-center border-custom">
+                        <div class="card-header fw-bold">Brake Torque</div>
+                        <div class="card-body"><span id="brake-torque-value" class="value">- Nm</span></div>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div class="card bg-dark text-white small-card text-center border-custom">
+                        <div class="card-header fw-bold">Current</div>
+                        <div class="card-body"><span id="current-value" class="value">- A</span></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="card bg-dark text-white small-card text-center border-custom">
+                        <div class="card-header fw-bold">Voltage</div>
+                        <div class="card-body"><span id="voltage-value" class="value">- V</span></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="card bg-dark text-white small-card text-center border-custom">
+                        <div class="card-header fw-bold">DynoPower Temp</div>
+                        <div class="card-body"><span id="elec-temp-value" class="value">- °C</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- End of sidebar, begin modals -->
+        <!-- Modal 1: Save Test - name and comment for the completed test run -->
+        <div class="modal fade" id="saveTestModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header" style="border-bottom: 2px solid #F0B823;">
+                        <h1 class="modal-title fs-5 text-white fw-bold" id="exampleModalLabel"><i class="bi bi-floppy-fill me-2"></i>Save Run</h1>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="testNameInput" class="form-label text-white fw-bold">Name</label>
+                            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="nameHelp"
+                                placeholder="Enter test name" data-bs-toggle="tooltip"
+                                title="Unique identifier for this test run">
+                            <div id="nameHelp" class="form-text text-white">Unique name for the test.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="testCommentInput" class="form-label text-white fw-bold">Comment</label>
+                            <textarea class="form-control" aria-label="With textarea" data-bs-toggle="tooltip"
+                                title="Optional notes or description for this test"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div data-coreui-date="2023/03/15" data-coreui-locale="en-US"
+                                data-coreui-toggle="date-picker">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 2px solid #F0B823;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                                class="bi bi-x-circle"></i>
+                            Close</button>
+                        <button id="save-test-button" type="button" class="btn btn-primary"><i
+                                class="bi bi-floppy-fill"></i>
+                            Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 2: Graph Configuration - axis limits for all 4 chart types (Live, Speed, Torque, Dynamic) -->
+        <div class="modal fade" id="graphConfigModal" tabindex="-1" aria-labelledby="graphConfigModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header" style="border-bottom: 2px solid #F0B823;">
+                        <h5 class="modal-title fw-bold text-white" id="graphConfigModalLabel"><i
+                                class="bi bi-graph-up"></i>
+                            Graph Configuration</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center p-2 rounded" style="background: rgba(240,184,35,0.1); border: 1px solid #F0B823;">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="display-filter-toggle" checked>
+                                        <label class="form-check-label text-white ms-2" for="display-filter-toggle">
+                                            <i class="bi bi-funnel-fill me-1" style="color: #F0B823;"></i>
+                                            Torque Display Filter
+                                        </label>
+                                    </div>
+                                    <small class="text-muted ms-3">Smooths inertia-induced oscillation in torque charts. Raw data is always saved.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card bg-dark mb-3 border-custom">
+                                    <h5 class="card-header fw-bold text-white"><i class="bi bi-broadcast-pin"></i> Live
+                                        Graph
+                                        Config</h5>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="live-graph-max-points-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrows"></i> Max Points</label>
+                                            <input class="form-control" id="live-graph-max-points-input"
+                                                title="Maximum data points to display (older points removed when exceeded)"
+                                                data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="live-graph-torque-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Torque</label>
+                                            <input class="form-control" id="live-graph-torque-min-input"
+                                                title="Minimum value for torque Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="live-graph-torque-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Torque</label>
+                                            <input class="form-control" id="live-graph-torque-max-input"
+                                                title="Maximum value for torque Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="live-graph-speed-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Speed</label>
+                                            <input class="form-control" id="live-graph-speed-min-input"
+                                                title="Minimum value for speed Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="live-graph-speed-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Speed</label>
+                                            <input class="form-control" id="live-graph-speed-max-input"
+                                                title="Maximum value for speed Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="live-graph-power-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Power</label>
+                                            <input class="form-control" id="live-graph-power-max-input"
+                                                title="Maximum value for power Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="live-graph-power-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Power</label>
+                                            <input class="form-control" id="live-graph-power-min-input"
+                                                title="Minimum value for power Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card bg-dark mb-3 border-custom">
+
+                                    <h5 class="card-header fw-bold text-white"><i class="bi bi-speedometer"></i> Speed
+                                        Graph
+                                        Config</h5>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="speed-graph-max-points-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrows"></i> Max Points</label>
+                                            <input class="form-control" id="speed-graph-max-points-input"
+                                                title="Maximum data points to display (older points removed when exceeded)"
+                                                data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="speed-graph-torque-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i>
+                                                Min Torque</label>
+                                            <input class="form-control" id="speed-graph-torque-min-input"
+                                                title="Minimum value for torque Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="speed-graph-torque-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Torque</label>
+                                            <input class="form-control" id="speed-graph-torque-max-input"
+                                                title="Maximum value for torque Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="speed-graph-speed-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Speed</label>
+                                            <input class="form-control" id="speed-graph-speed-min-input"
+                                                title="Minimum value for speed Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="speed-graph-speed-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Speed</label>
+                                            <input class="form-control" id="speed-graph-speed-max-input"
+                                                title="Maximum value for speed Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="speed-graph-power-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Power</label>
+                                            <input class="form-control" id="speed-graph-power-max-input"
+                                                title="Maximum value for power Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="speed-graph-power-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Power</label>
+                                            <input class="form-control" id="speed-graph-power-min-input"
+                                                title="Minimum value for power Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card bg-dark mb-3 border-custom">
+                                    <h5 class="card-header fw-bold text-white"><i class="bi bi-arrow-repeat"></i> Torque
+                                        Graph
+                                        Config</h5>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="torque-graph-max-points-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrows"></i> Max Points</label>
+                                            <input class="form-control" id="torque-graph-max-points-input"
+                                                title="Maximum data points to display (older points removed when exceeded)"
+                                                data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="torque-graph-torque-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Torque</label>
+                                            <input class="form-control" id="torque-graph-torque-min-input"
+                                                title="Minimum value for torque Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="torque-graph-torque-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Torque</label>
+                                            <input class="form-control" id="torque-graph-torque-max-input"
+                                                title="Maximum value for torque Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="torque-graph-speed-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Speed</label>
+                                            <input class="form-control" id="torque-graph-speed-min-input"
+                                                title="Minimum value for speed Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="torque-graph-speed-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Speed</label>
+                                            <input class="form-control" id="torque-graph-speed-max-input"
+                                                title="Maximum value for speed Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="torque-graph-power-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Power</label>
+                                            <input class="form-control" id="torque-graph-power-min-input"
+                                                title="Minimum value for power Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="torque-graph-power-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Power</label>
+                                            <input class="form-control" id="torque-graph-power-max-input"
+                                                title="Maximum value for power Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card bg-dark mb-3 border-custom">
+                                    <h5 class="card-header fw-bold text-white"><i class="bi bi-crosshair"></i> Dynamic
+                                        Graph
+                                        Config</h5>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="dynamic-graph-max-points-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrows"></i> Max Points</label>
+                                            <input class="form-control" id="dynamic-graph-max-points-input"
+                                                title="Maximum data points to display (older points removed when exceeded)"
+                                                data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="dynamic-graph-torque-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Torque</label>
+                                            <input class="form-control" id="dynamic-graph-torque-min-input"
+                                                title="Minimum value for torque Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="dynamic-graph-torque-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Torque</label>
+                                            <input class="form-control" id="dynamic-graph-torque-max-input"
+                                                title="Maximum value for torque Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="dynamic-graph-power-min-input"
+                                                class="form-label fw-bold text-white"><i
+                                                    class="bi bi-arrow-bar-down"></i> Min Power</label>
+                                            <input class="form-control" id="dynamic-graph-power-min-input"
+                                                title="Minimum value for power Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="dynamic-graph-power-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max Power</label>
+                                            <input class="form-control" id="dynamic-graph-power-max-input"
+                                                title="Maximum value for power Y-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="dynamic-graph-rpm-min-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Min RPM</label>
+                                            <input class="form-control" id="dynamic-graph-rpm-min-input"
+                                                title="Minimum value for RPM X-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="dynamic-graph-rpm-max-input"
+                                                class="form-label fw-bold text-white"><i class="bi bi-arrow-bar-up"></i>
+                                                Max RPM</label>
+                                            <input class="form-control" id="dynamic-graph-rpm-max-input"
+                                                title="Maximum value for RPM X-axis" data-bs-toggle="tooltip">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 2px solid #F0B823;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                                class="bi bi-x-circle"></i>
+                            Close</button>
+                        <button id="save-graph-config" type="button" class="btn btn-primary"><i
+                                class="bi bi-floppy-fill"></i>
+                            Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endblock %}
+
+        {% block final %}
+
+        <!-- Index page JavaScript -->
+        <!-- Live chart wrapper: uPlot initialization and real-time data handling -->
+        <script src="{{ url_for('static', filename='js/app/index-live-chart.js')}}"></script>
+        <!-- Index page logic: test controls, data display, configuration, modals -->
+        <script src="{{ url_for('static', filename='js/app/index.js')}}"></script>
+
+        {% endblock %}

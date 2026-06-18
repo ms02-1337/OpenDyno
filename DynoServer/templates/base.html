@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenDyno</title>
+    <!-- Bootstrap CSS framework -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vendor/bootstrap/bootstrap.min.css') }}">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vendor/bootstrap-icons/bootstrap-icons.css') }}">
+    <!-- Application-specific base styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app/base.css') }}">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='icons/app/favicon.ico') }}">
+
+    {% block headers %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navigation bar with system controls and status indicators -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <!-- Application logo -->
+            <a class="navbar-brand" href="/">
+                (OpenDyno)
+            </a>
+            <!-- Mobile menu toggle button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Main navigation links (left-aligned) -->
+                <ul class="navbar-nav me-auto">
+                    <!-- Dyno run page - main test interface -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'web.index' %} active {% endif %}" href="/"><i
+                                class="bi bi-rocket-takeoff-fill"></i> Dyno Run</a>
+                    </li>
+                    <!-- Logs page - view and export test results -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'web.logs' %} active {% endif %}" href="/logs"><i
+                                class="bi bi-sd-card-fill"></i> Logs</a>
+                    </li>
+                    <!-- Configuration page - system parameters -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'web.config' %} active {% endif %}"
+                            href="/config"><i class="bi bi-tools"></i> Configuration</a>
+                    </li>
+                    <!-- Debug page - hidden by default, shown via JavaScript when debug mode enabled -->
+                    <li class="nav-item" style="display: none;" id="debug-link">
+                        <a class="nav-link {% if request.endpoint == 'web.debug' %} active {% endif %}" href="/debug"><i
+                                class="bi bi-bug-fill"></i> Debug</a>
+                    </li>
+                </ul>
+                <!-- Live data toggle switch - controls real-time chart updates -->
+                <div class="d-flex align-items-center">
+                    <label class="form-check-label fs-5 pe-3 text-white fw-bold" for="liveDataSwitch">Live data:
+                    </label>
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input fs-5" type="checkbox" role="switch" id="liveDataSwitch" checked
+                            style="margin-top: 5px;">
+                    </div>
+                </div>
+            </div>
+            <!-- Info message display with history dropdown -->
+            <div class="ms-auto d-flex align-items-center">
+                <span class="fs-5 px-3 py-2 text-white fw-bold">Info: </span>
+                <span id="info-badge" class="badge text-bg-danger fs-5 px-3 py-2">Waiting DynoLogic...</span>
+                <div class="dropdown">
+                    <!-- Dropdown button to show info message history -->
+                    <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                        aria-label="Show info history">
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-dark info-history-dropdown">
+                        <div class="d-flex flex-column">
+                            <h5 class="text-center mb-3">Info History</h5>
+                            <!-- Read-only textarea showing historical info messages from the system -->
+                            <textarea class="info-history-textarea" readonly id="info-history-textarea">
+                            </textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Power unit selector dropdown (kW/HP) -->
+            <div class="ms-3 d-flex align-items-center">
+                <span class="fs-6 py-2 text-white me-2">Units:</span>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-dark dropdown-toggle fs-6 py-1 text-white" type="button"
+                        id="powerUnitDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span id="currentPowerUnit">kW</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="powerUnitDropdown">
+                        <li><a class="dropdown-item" href="#" data-power-unit="kW">kW</a></li>
+                        <li><a class="dropdown-item" href="#" data-power-unit="HP">HP</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Environmental data display - brake temp, ambient temp, humidity -->
+            <div class="ms-2 d-flex align-items-center">
+                <span class="fs-6 py-2 text-white"><i class="bi bi-arrow-repeat" title="Brake temperature"></i> :</span>
+                <span class="fs-6 px-3 py-2 text-white" id="brake_temperature">-</span>
+                <span class="fs-6 py-2 text-white"><i class="bi bi-thermometer-half" title="Ambient temperature"></i>
+                    :</span>
+                <span class="fs-6 px-3 py-2 text-white" id="env_temperature">-</span>
+                <span class="fs-6 py-2 text-white"><i class="bi bi-moisture" title="Relative humidity"></i> :</span>
+                <span class="fs-6 px-3 py-2 text-white" id="env_humidity">-</span>
+            </div>
+            <!-- System status badge and CAN connection indicator -->
+            <div class="d-flex align-items-center">
+                <span class="fs-5 px-3 py-2 text-white fw-bold">Status: </span>
+                <span id="status-badge" class="badge text-bg-danger fs-5 px-3 py-2">-</span>
+                <!-- Connection icon: red when disconnected, green when connected to DynoLogic -->
+                <span class="fs-5 px-3 py-2 text-white fw-bold"><i class="bi bi-ethernet text-danger"
+                        id="connectionIcon" title="CAN connection status"></i></span>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Main content area - pages override this block -->
+    <div class="container-fluid">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- JavaScript dependencies -->
+    <!-- Socket.IO for real-time WebSocket communication with server -->
+    <script src="{{ url_for('static', filename='js/vendor/socket.io/socket.io.min.js') }}"></script>
+    <!-- jQuery (dependency for some Bootstrap components) -->
+    <script src="{{ url_for('static', filename='js/vendor/jquery/jquery.min.js') }}"></script>
+    <!-- Popper.js (tooltip/positioning engine for Bootstrap) -->
+    <script src="{{ url_for('static', filename='js/vendor/popper/popper.min.js') }}"></script>
+    <!-- Bootstrap JavaScript bundle -->
+    <script src="{{ url_for('static', filename='js/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <!-- Application core - Socket.IO setup, event handlers, live data toggle -->
+    <script src="{{ url_for('static', filename='js/app/base.js')}}"></script>
+    <!-- Utility functions - formatting, unit conversions -->
+    <script src="{{ url_for('static', filename='js/app/utils.js') }}"></script>
+    <!-- Power unit handling (kW/HP conversion) -->
+    <script src="{{ url_for('static', filename='js/app/power-units.js') }}"></script>
+
+    <!-- Page-specific scripts - child templates can inject additional scripts -->
+    {% block final %}{% endblock %}
+</body>
+
+</html>

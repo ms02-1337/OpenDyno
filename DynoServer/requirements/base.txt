@@ -1,0 +1,14 @@
+# Flask
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# WebSocket support
+flask-socketio==5.3.5
+gevent>=23.9.1
+gevent-websocket>=0.10.1
+
+# CAN bus
+python-can==4.3.1
+
+# Utilities
+python-dotenv==1.0.0

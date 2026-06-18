@@ -1,0 +1,135 @@
+{
+    "launch": {
+        "startSpeed": 500.0,
+        "stableTime": 1000.0,
+        "endSpeed": 4000.0,
+        "rampRate": 500.0,
+        "endHoldDelay": 2000.0,
+        "rampDownRate": 500.0,
+        "finalSpeed": 500.0
+    },
+    "speedLimits": {
+        "minSpeed": 500,
+        "maxSpeed": 4500
+    },
+    "loadCell": {
+        "gain": 128,
+        "offset": 0,
+        "scale": -20000.0,
+        "distance": 0.5
+    },
+    "inertiaAndLoads": {
+        "dynoInertia": 0.6,
+        "chainInertia": 0.1,
+        "fanInertia": 0.8
+    },
+    "torquePID": {
+        "kp": 0.1,
+        "ki": 0.2,
+        "kd": 0.01
+    },
+    "speedPID": {
+        "kp": 0.05,
+        "ki": 0.1,
+        "kd": 0.01
+    },
+    "dynamicPID": {
+        "kp": 0.02,
+        "ki": 0.08,
+        "kd": 0.001
+    },
+    "ratio": {
+        "motorPinions": 13,
+        "dynoPinions": 24
+    },
+    "pwm": {
+        "start": 0,
+        "limit": 300,
+        "frequency": 1000
+    },
+    "low_pass_filters": {
+        "speed": 20,
+        "torque": 15,
+        "acceleration": 10,
+        "output": 20
+    },
+    "live_graph": {
+        "max_points": 1000,
+        "torque_min": 0.0,
+        "torque_max": 200.0,
+        "speed_min": 0.0,
+        "speed_max": 5000.0,
+        "power_min": 0.0,
+        "power_max": 1000.0
+    },
+    "speed_graph": {
+        "max_points": 1000,
+        "torque_min": 0.0,
+        "torque_max": 200.0,
+        "speed_min": 0.0,
+        "speed_max": 5000.0,
+        "power_min": 0.0,
+        "power_max": 1000.0
+    },
+    "torque_graph": {
+        "max_points": 3000,
+        "torque_min": 0.0,
+        "torque_max": 200.0,
+        "speed_min": 0.0,
+        "speed_max": 5000.0,
+        "power_min": 0.0,
+        "power_max": 1000.0
+    },
+    "dynamic_graph": {
+        "max_points": 5000,
+        "torque_min": 0.0,
+        "torque_max": 200.0,
+        "power_min": 0.0,
+        "power_max": 1000.0,
+        "rpm_min": 500.0,
+        "rpm_max": 5000.0
+    },
+    "debug_graph": {
+        "max_points": 3000,
+        "torque_min": 0.0,
+        "torque_max": 200.0,
+        "speed_min": 0.0,
+        "speed_max": 5000.0,
+        "pwm_min": 0.0,
+        "pwm_max": 400.0,
+        "acc_min": -2000.0,
+        "acc_max": 2000.0
+    },
+    "runMode": {
+        "mode": "1",
+        "value": 500,
+        "rawValue": 500.0,
+        "options": [
+            "Dynamic",
+            "Torque",
+            "Speed",
+            "Dynamic debug"
+        ]
+    },
+    "debug": {
+        "enabled": false
+    },
+    "display_filter": {
+        "enabled": true
+    },
+    "live_display": {
+        "speed_window": 5,
+        "torque_window": 8,
+        "enabled": true
+    },
+    "post_process": {
+        "cutoff_hz": 15.0,
+        "order": 4
+    },
+    "canInterface": {
+        "mode": "slcan",
+        "channel": "/dev/ttyACM0",
+        "bitrate": 500000
+    },
+    "checksum": "0x0000"
+}

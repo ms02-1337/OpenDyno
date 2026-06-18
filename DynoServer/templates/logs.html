@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+{% block headers %}
+
+<!-- Logs page custom styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app/logs.css') }}">
+<!-- ApexCharts: Interactive charting library for saved test data visualization -->
+<script src="{{ url_for('static', filename='js/vendor/apexcharts/apexcharts.min.js') }}"></script>
+<!-- jQuery (dependency for some legacy functionality) -->
+<script src="{{ url_for('static', filename='js/vendor/jquery/jquery.min.js') }}"></script>
+
+{% endblock %}
+{% block content %}
+
+<div class="row">
+  <!-- Left Column: Test runs list (scrollable sidebar) -->
+  <div class="col-2 mt-2" style="height: calc(100vh - 90px); display: flex; flex-direction: column; overflow-y: auto;">
+    <!-- List title (white background, dark border, rounded, centered) -->
+    <div class="d-flex justify-content-between align-items-center px-3 py-2 bg-dark border text-white border-2 border-dark rounded text-center mb-1">
+      <h5 class="mb-0 fw-bold">Test Runs</h5>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="logFilterDropdown"
+            data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"
+            title="Toggle torque display filter">
+          <i class="bi bi-funnel"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="logFilterDropdown">
+          <li>
+            <div class="dropdown-item d-flex align-items-center">
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" id="log-display-filter-toggle" checked>
+                <label class="form-check-label text-white ms-2" for="log-display-filter-toggle">Torque Filter</label>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- Scrollable list of saved test runs (populated via JavaScript) -->
+    <div class="list-group" id="log-list" style="flex: 1 1 auto; min-height: 0; overflow-y: auto;">
+    </div>
+  </div>
+  <!-- Right Column: Chart, data displays, and comparison view -->
+  <div class="col d-flex flex-column" style="height: calc(100vh - 82px); min-width: 0; overflow: hidden;">
+    <!-- Empty state: shown when no log is selected -->
+    <div id="emptyState" class="align-items-center justify-content-center" style="display: flex; height: 100%;">
+      <div class="text-center">
+        <i class="bi bi-inbox" style="font-size: 4rem; color: #6c757d;"></i>
+        <h3 class="mt-3" style="color: #6c757d;">Please select a log</h3>
+        <p style="color: #999;">Choose a test run from the list to view its data</p>
+      </div>
+    </div>
+    <!-- Comparison legend: shows which colors correspond to each log when comparing -->
+    <div class="row mb-2" id="comparisonLegend" style="display: none;">
+      <div class="col">
+        <div class="d-flex align-items-center justify-content-center gap-3">
+          <div class="d-flex align-items-center">
+            <div class="color-indicator me-2"
+              style="width: 20px; height: 20px; background-color: #000000; border-radius: 3px;"></div>
+            <span id="legendLog1">Log 1</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="color-indicator me-2"
+              style="width: 20px; height: 20px; background-color: #FF0000; border-radius: 3px;"></div>
+            <span id="legendLog2">Log 2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Content Container: Chart and data cards (hidden until log is selected) -->
+    <div id="contentContainer" class="flex-column" style="display: none; height: 100%;">
+      <!-- Row 1: ApexChart for displaying torque, speed, and power curves -->
+      <div class="row">
+        <div class="col-12">
+          <div id="chart"></div>
+        </div>
+      </div>
+      <!-- Row 2: Data cards displaying test results (6 columns with single/comparison displays) -->
+      <div class="row flex-grow-1 flex-wrap g-1 m-0" style="min-height: 0; overflow: hidden;">
+        <!-- Column 1: Power display (single or comparison) -->
+        <div class="col d-flex flex-column" style="flex-grow: 1; min-height: 0; display: flex;">
+          <div class="card text-white bg-dark text-center flex-grow-1">
+            <div class="card-header fw-bold py-1"><i class="bi bi-arrow-repeat"></i> Power</div>
+            <div class="card-body d-flex flex-column justify-content-center p-1" style="font-size: calc(0.8rem + 1vh);">
+              <!-- Single display (default) -->
+              <div id="powerSingleDisplay">
+                <h1 class="display-6 fw-bold" id="logPower" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                <span class="fs-5 text-white ms-2" id="power-unit-label">kW</span>
+              </div>
+              <!-- Comparison display (hidden by default) -->
+              <div id="powerComparisonDisplay" style="display: none;">
+                <div class="d-flex justify-content-around align-items-center">
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logPower1" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2" id="power-unit-label-1">kW</span>
+                  </div>
+                  <div class="vr mx-2" style="opacity: 0.5;"></div>
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logPower2" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2" id="power-unit-label-2">kW</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Column 2: Torque display (single or comparison) -->
+        <div class="col d-flex flex-column" style="flex-grow: 1; min-height: 0; display: flex;">
+          <div class="card text-white bg-dark text-center flex-grow-1">
+            <div class="card-header fw-bold py-1"><i class="bi bi-box-arrow-down"></i> Torque</div>
+            <div class="card-body d-flex flex-column justify-content-center p-1" style="font-size: calc(0.8rem + 1vh);">
+              <!-- Single display (default) -->
+              <div id="torqueSingleDisplay">
+                <h1 class="display-6 fw-bold" id="logTorque" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                <span class="fs-5 text-white ms-2">Nm</span>
+              </div>
+              <!-- Comparison display (hidden by default) -->
+              <div id="torqueComparisonDisplay" style="display: none;">
+                <div class="d-flex justify-content-around align-items-center">
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logTorque1" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2">Nm</span>
+                  </div>
+                  <div class="vr mx-2" style="opacity: 0.5;"></div>
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logTorque2" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2">Nm</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Column 3: Motor speed display (single or comparison) -->
+        <div class="col d-flex flex-column" style="flex-grow: 1; min-height: 0; display: flex;">
+          <div class="card text-white bg-dark text-center flex-grow-1">
+            <div class="card-header fw-bold py-1"><i class="bi bi-speedometer"></i> Motor speed</div>
+            <div class="card-body d-flex flex-column justify-content-center p-1">
+              <!-- Single display (default) -->
+              <div id="motorSpeedSingleDisplay">
+                <h1 class="display-6 fw-bold" id="logMotorSpeed" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                <span class="fs-5 text-white ms-2">RPM</span>
+              </div>
+              <!-- Comparison display (hidden by default) -->
+              <div id="motorSpeedComparisonDisplay" style="display: none;">
+                <div class="d-flex justify-content-around align-items-center">
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logMotorSpeed1" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2">RPM</span>
+                  </div>
+                  <div class="vr mx-2" style="opacity: 0.5;"></div>
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logMotorSpeed2" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2">RPM</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Column 4: Max power display (single or comparison) -->
+        <div class="col d-flex flex-column" style="flex-grow: 1; min-height: 0; display: flex;">
+          <div class="card text-white bg-dark text-center flex-grow-1">
+            <div class="card-header fw-bold py-1"><i class="bi bi-arrow-bar-up"></i> Max power</div>
+            <div class="card-body d-flex flex-column justify-content-center p-1" style="font-size: calc(0.8rem + 1vh);">
+              <!-- Single display (default) -->
+              <div id="maxPowerSingleDisplay">
+                <h1 class="display-6 fw-bold" id="logMaxPower" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                <span class="fs-6 text-white ms-2" id="logMaxPowerRpm"><span id="max-power-unit-label">kW</span> @ -
+                  rpm</span>
+              </div>
+              <!-- Comparison display (hidden by default) -->
+              <div id="maxPowerComparisonDisplay" style="display: none;">
+                <div class="d-flex justify-content-around align-items-center">
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logMaxPower1" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-6 text-white ms-2" id="logMaxPowerRpm1"><span id="max-power-unit-label-1">kW</span>
+                      @ - rpm</span>
+                  </div>
+                  <div class="vr mx-2" style="opacity: 0.5;"></div>
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logMaxPower2" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-6 text-white ms-2" id="logMaxPowerRpm2"><span id="max-power-unit-label-2">kW</span>
+                      @ - rpm</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Column 5: Max torque display (single or comparison) -->
+        <div class="col d-flex flex-column" style="flex-grow: 1; min-height: 0; display: flex;">
+          <div class="card text-white bg-dark text-center flex-grow-1">
+            <div class="card-header fw-bold py-1"><i class="bi bi-arrow-bar-up"></i> Max torque</div>
+            <div class="card-body d-flex flex-column justify-content-center p-1">
+              <!-- Single display (default) -->
+              <div id="maxTorqueSingleDisplay">
+                <h1 class="display-6 fw-bold" id="logMaxTorque" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                <span class="fs-6 text-white ms-2" id="logMaxTorqueRpm">Nm @ - rpm</span>
+              </div>
+              <!-- Comparison display (hidden by default) -->
+              <div id="maxTorqueComparisonDisplay" style="display: none;">
+                <div class="d-flex justify-content-around align-items-center">
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logMaxTorque1" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-6 text-white ms-2" id="logMaxTorqueRpm1">Nm @ - rpm</span>
+                  </div>
+                  <div class="vr mx-2" style="opacity: 0.5;"></div>
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logMaxTorque2" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-6 text-white ms-2" id="logMaxTorqueRpm2">Nm @ - rpm</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Column 6: Max speed display (single or comparison) -->
+        <div class="col d-flex flex-column" style="flex-grow: 1; min-height: 0; display: flex;">
+          <div class="card text-white bg-dark text-center flex-grow-1">
+            <div class="card-header fw-bold py-1"><i class="bi bi-arrow-bar-up"></i> Max speed</div>
+            <div class="card-body d-flex flex-column justify-content-center p-1">
+              <!-- Single display (default) -->
+              <div id="maxSpeedSingleDisplay">
+                <h1 class="display-6 fw-bold" id="logMaxSpeed" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                <span class="fs-5 text-white ms-2">RPM</span>
+              </div>
+              <!-- Comparison display (hidden by default) -->
+              <div id="maxSpeedComparisonDisplay" style="display: none;">
+                <div class="d-flex justify-content-around align-items-center">
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logMaxSpeed1" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2">RPM</span>
+                  </div>
+                  <div class="vr mx-2" style="opacity: 0.5;"></div>
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logMaxSpeed2" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2">RPM</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Column 7: Time elapsed display (single or comparison) -->
+        <div class="col d-flex flex-column" style="flex-grow: 1; min-height: 0; display: flex;">
+          <div class="card text-white bg-dark text-center flex-grow-1">
+            <div class="card-header fw-bold py-1"><i class="bi bi-clock"></i> Time elapsed</div>
+            <div class="card-body d-flex flex-column justify-content-center p-1">
+              <!-- Single display (default) -->
+              <div id="timeElapsedSingleDisplay">
+                <h1 class="display-6 fw-bold" id="logTimeElapsed" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                <span class="fs-5 text-white ms-2">seconds</span>
+              </div>
+              <!-- Comparison display (hidden by default) -->
+              <div id="timeElapsedComparisonDisplay" style="display: none;">
+                <div class="d-flex justify-content-around align-items-center">
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logTimeElapsed1" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2">seconds</span>
+                  </div>
+                  <div class="vr mx-2" style="opacity: 0.5;"></div>
+                  <div>
+                    <h1 class="display-6 fw-bold" id="logTimeElapsed2" style="font-size: calc(1rem + 1.5vh);">-</h1>
+                    <span class="fs-5 text-white ms-2">seconds</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> <!-- Close contentContainer -->
+</div>
+<!-- Confirm Delete Modal: Dark-themed confirmation dialog for deleting test runs -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border border-secondary">
+      <div class="modal-header" style="border-bottom: 2px solid #F0B823;">
+        <h5 class="modal-title fw-bold" id="confirmDeleteModalLabel"><i class="bi bi-trash me-2"></i>Confirm Delete</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this log? This action cannot be undone.
+      </div>
+      <div class="modal-footer" style="border-top: 2px solid #F0B823;">
+        <button type="button" id="cancelDeleteBtn" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-circle"></i> Cancel
+        </button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
+          <i class="bi bi-trash me-1"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+<!-- Logs page JavaScript -->
+{% block final %}
+<!-- Logs chart logic: ApexCharts initialization, data display, comparison mode, delete handling -->
+<script src="{{ url_for('static', filename='js/app/logs-chart.js')}}"></script>
+{% endblock %}

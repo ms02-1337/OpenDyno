@@ -1,0 +1,68 @@
+/* ============================================================
+   CONFIGURATION PAGE STYLES
+   Page-specific styles for the configuration management interface
+   Common styles inherited from base.css
+   ============================================================ */
+
+/* ============================================================
+   CARD OVERRIDES
+   Ensure white text on dark background cards
+   ============================================================ */
+.card.bg-dark {
+  color: white;
+}
+
+/* ============================================================
+   FORM HELP TEXT
+   Secondary text for field descriptions/hints
+   ============================================================ */
+.form-text {
+  color: gray;
+}
+
+/* ============================================================
+   NAVIGATION PILLS (TABS)
+   Vertical tab navigation for configuration sections
+   ============================================================ */
+.nav-pills .nav-link {
+  color: white;
+  background-color: var(--dyno-bg-dark);
+  border: 1px solid var(--dyno-border);
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+  background-color: var(--dyno-bg-dark);
+  color: white;
+  border-left: 3px solid var(--dyno-primary);
+}
+
+.nav-pills .nav-link:hover {
+  background-color: var(--dyno-bg-darker);
+  color: white;
+}
+
+/* ============================================================
+   LAYOUT OVERRIDES
+   ============================================================ */
+
+/* Tab column width constraint */
+.col-md-2 {
+  max-width: 200px;
+}
+
+/* Sticky sidebar - stays visible while scrolling
+   Positioned below navbar using CSS variable from base.css
+*/
+.sticky-top {
+  position: sticky;
+  top: var(--navbar-height);
+  z-index: 1020;
+}
+
+/* Equal height cards for consistent tab panel layout */
+.h-100 {
+  height: 100% !important;
+}

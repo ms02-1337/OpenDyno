@@ -1,0 +1,820 @@
+{% extends "base.html" %}
+{% block headers %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app/configuration.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <div class="row mt-4">
+    <!-- Left sidebar: vertical navigation tabs for config categories -->
+    <div class="col-md-3">
+      <div class="nav flex-column nav-pills me-3 sticky-top" id="v-pills-tab" role="tablist" aria-orientation="vertical"
+        style="top: 20px;">
+        <button class="nav-link active" id="v-pills-dynamic-test-tab" data-bs-toggle="pill"
+          data-bs-target="#v-pills-dynamic-test" type="button" role="tab" aria-controls="v-pills-dynamic-test"
+          aria-selected="true">
+          <i class="bi bi-bezier me-2"></i>Dynamic Test
+        </button>
+        <button class="nav-link" id="v-pills-run-mode-tab" data-bs-toggle="pill" data-bs-target="#v-pills-run-mode"
+          type="button" role="tab" aria-controls="v-pills-run-mode" aria-selected="false">
+          <i class="bi bi-speedometer me-2"></i>Run Mode
+        </button>
+        <button class="nav-link" id="v-pills-brake-limits-tab" data-bs-toggle="pill"
+          data-bs-target="#v-pills-brake-limits" type="button" role="tab" aria-controls="v-pills-brake-limits"
+          aria-selected="false">
+          <i class="bi bi-arrows-expand me-2"></i>Brake Limits
+        </button>
+        <button class="nav-link" id="v-pills-motor-ratio-tab" data-bs-toggle="pill"
+          data-bs-target="#v-pills-motor-ratio" type="button" role="tab" aria-controls="v-pills-motor-ratio"
+          aria-selected="false">
+          <i class="bi bi-gear-wide-connected me-2"></i>Motor Ratio
+        </button>
+        <button class="nav-link" id="v-pills-debug-tab" data-bs-toggle="pill" data-bs-target="#v-pills-debug"
+          type="button" role="tab" aria-controls="v-pills-debug" aria-selected="false">
+          <i class="bi bi-bug-fill me-2"></i>Debug
+        </button>
+        <button class="nav-link" id="v-pills-filters-tab" data-bs-toggle="pill" data-bs-target="#v-pills-filters"
+          type="button" role="tab" aria-controls="v-pills-filters" aria-selected="false">
+          <i class="bi bi-reception-2 me-2"></i>Low-Pass Filters
+        </button>
+        <button class="nav-link" id="v-pills-pid-tab" data-bs-toggle="pill" data-bs-target="#v-pills-pid" type="button"
+          role="tab" aria-controls="v-pills-pid" aria-selected="false">
+          <i class="bi bi-graph-up-arrow me-2"></i>PID Configuration
+        </button>
+        <button class="nav-link" id="v-pills-inertia-tab" data-bs-toggle="pill" data-bs-target="#v-pills-inertia"
+          type="button" role="tab" aria-controls="v-pills-inertia" aria-selected="false">
+          <i class="bi bi-arrow-repeat me-2"></i>Inertia & Loads
+        </button>
+        <button class="nav-link" id="v-pills-load-cell-tab" data-bs-toggle="pill" data-bs-target="#v-pills-load-cell"
+          type="button" role="tab" aria-controls="v-pills-load-cell" aria-selected="false">
+          <i class="bi bi-box-arrow-down me-2"></i>Load Cell
+        </button>
+        <button class="nav-link" id="v-pills-pwm-tab" data-bs-toggle="pill" data-bs-target="#v-pills-pwm" type="button"
+          role="tab" aria-controls="v-pills-pwm" aria-selected="false">
+          <i class="bi bi-reception-4 me-2"></i>PWM Configuration
+        </button>
+        <button class="nav-link" id="v-pills-graph-tab" data-bs-toggle="pill" data-bs-target="#v-pills-graph"
+          type="button" role="tab" aria-controls="v-pills-graph" aria-selected="false">
+          <i class="bi bi-graph-up me-2"></i>Graph Configuration
+        </button>
+        <button class="nav-link" id="v-pills-debug-graph-tab" data-bs-toggle="pill"
+          data-bs-target="#v-pills-debug-graph" type="button" role="tab" aria-controls="v-pills-debug-graph"
+          aria-selected="false">
+          <i class="bi bi-bug-fill me-2"></i>Debug Graph
+        </button>
+        <button class="nav-link" id="v-pills-can-interface-tab" data-bs-toggle="pill"
+          data-bs-target="#v-pills-can-interface" type="button" role="tab" aria-controls="v-pills-can-interface"
+          aria-selected="false">
+          <i class="bi bi-usb-symbol me-2"></i>CAN Interface
+        </button>
+      </div>
+
+      <!-- Save button and alert placeholder -->
+      <div class="d-flex justify-content-center mt-3">
+        <button type="button" class="btn btn-warning fw-bold" id="save-config-btn"><i class="bi bi-floppy-fill me-2"></i>Save Configuration</button>
+      </div>
+      <!-- Bootstrap alert placeholder for save success/error messages -->
+      <div id="liveAlertPlaceholder" class="mt-3 fw-bold text-center"></div>
+    </div>
+
+    <!-- Right column: configuration panels for each tab -->
+    <div class="col-md-9">
+      <div class="tab-content" id="v-pills-tabContent">
+        <!-- Dynamic Test Configuration: speed ramp profile for acceleration testing -->
+        <div class="tab-pane fade show active" id="v-pills-dynamic-test" role="tabpanel"
+          aria-labelledby="v-pills-dynamic-test-tab">
+          <div class="card bg-dark">
+            <h5 class="card-header fw-bold text-center"><i class="bi bi-bezier"></i> Dynamic Test Configuration</h5>
+            <div class="card-body">
+              <div class="row">
+                <!-- Left column: dynamic test parameters -->
+                <div class="col-md-3">
+                  <div class="mb-3">
+                    <label for="start-speed-input" class="form-label fw-bold">Start speed (rpm)</label>
+                    <input type="text" class="form-control" id="start-speed-input"
+                      aria-describedby="start-speed-input-help" title="Initial speed at which the dynamic test begins"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text" id="start-speed-input-help">Start speed for dynamic test.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="stable-time-input" class="form-label fw-bold">Stable time (s)</label>
+                    <input type="text" class="form-control" id="stable-time-input"
+                      aria-describedby="stable-time-input-help"
+                      title="Time to wait at start speed before beginning the ramp" data-bs-toggle="tooltip">
+                    <div class="form-text" id="stable-time-input-help">Wait time after reaching start speed.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="ramp-time-input" class="form-label fw-bold">Ramp rate (rpm/s)</label>
+                    <input type="text" class="form-control" id="ramp-rate-input" aria-describedby="ramp-time-input-help"
+                      title="Speed increase rate during the acceleration phase" data-bs-toggle="tooltip">
+                    <div class="form-text" id="ramp-time-input-help">Acceleration rate from start to end speed.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="end-speed-input" class="form-label fw-bold">End speed (rpm)</label>
+                    <input type="text" class="form-control" id="end-speed-input" aria-describedby="end-speed-input-help"
+                      title="Target speed at the end of the ramp phase" data-bs-toggle="tooltip">
+                    <div class="form-text" id="end-speed-input-help">Final speed for dynamic test.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="end-hold-delay-input" class="form-label fw-bold">End hold delay (s)</label>
+                    <input type="text" class="form-control" id="end-hold-delay-input"
+                      aria-describedby="end-hold-delay-input-help"
+                      title="Time to maintain end speed before ramping down" data-bs-toggle="tooltip">
+                    <div class="form-text" id="end-hold-delay-input-help">Final speed hold time (s).</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="ramp-down-rate-input" class="form-label fw-bold">Ramp-down rate (rpm/s)</label>
+                    <input type="text" class="form-control" id="ramp-down-rate-input"
+                      aria-describedby="ramp-down-rate-input-help"
+                      title="Speed decrease rate during deceleration to final speed" data-bs-toggle="tooltip">
+                    <div class="form-text" id="ramp-down-rate-input-help">Ramp-down rate to stop.</div>
+                  </div>
+                  <div class="mb-6">
+                    <label for="final-speed-input" class="form-label fw-bold">Final speed (rpm)</label>
+                    <input type="text" class="form-control" id="final-speed-input"
+                      aria-describedby="final-speed-input-help"
+                      title="Low speed to maintain after ramp-down before stopping" data-bs-toggle="tooltip">
+                    <div class="form-text" id="final-speed-input-help">Final low speed.</div>
+                  </div>
+                </div>
+                <!-- Right column: visual diagram of the dynamic test profile -->
+                <div class="col-md-9 d-flex align-items-center justify-content-center">
+                  <img src="{{ url_for('static', filename='img/config.png') }}" class="img-fluid rounded"
+                    alt="Dynamic Test Configuration Diagram">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Run Mode: select operating mode (Dynamic, Constant Speed, Constant Torque) -->
+        <div class="tab-pane fade" id="v-pills-run-mode" role="tabpanel" aria-labelledby="v-pills-run-mode-tab">
+          <div class="row justify-content-center">
+            <div class="col-md-4">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-speedometer me-2"></i> Run Mode</h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="mode-input" class="form-label fw-bold">Mode</label>
+                    <select class="form-control" id="run-mode-input" title="Select the operating mode for the dyno"
+                      data-bs-toggle="tooltip">
+                      <option>Dynamic</option>
+                      <option>Constant speed</option>
+                      <option>Constant torque</option>
+                      <option>Dynamic debug</option>
+                    </select>
+                    <div class="form-text">Operating mode: Dynamic, Constant speed, or Constant torque.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="run-mode-value-input" class="form-label fw-bold">Value</label>
+                    <input class="form-control" id="run-mode-value-input" aria-describedby="run-mode-value-input-help"
+                      title="Setpoint value - meaning depends on selected mode" data-bs-toggle="tooltip">
+                    <div class="form-text" id="run-mode-value-input-help">Target value (Nm for torque mode, rpm for
+                      speed mode).
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brake Limits: min/max safe operating speeds for the eddy current brake -->
+        <div class="tab-pane fade" id="v-pills-brake-limits" role="tabpanel" aria-labelledby="v-pills-brake-limits-tab">
+          <div class="row justify-content-center">
+            <div class="col-md-4">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-arrows-expand"></i> Brake Limits</h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="min-speed-input" class="form-label fw-bold">Min Speed</label>
+                    <input class="form-control" id="min-speed-input" aria-describedby="min-speed-input-help"
+                      title="Minimum allowed brake operating speed (rpm)" data-bs-toggle="tooltip">
+                    <div class="form-text" id="min-speed-input-help">Minimum breaking speed.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="max-speed-input" class="form-label fw-bold">Max Speed</label>
+                    <input class="form-control" id="max-speed-input" aria-describedby="max-speed-input-help"
+                      title="Maximum allowed brake operating speed (rpm)" data-bs-toggle="tooltip">
+                    <div class="form-text" id="max-speed-input-help">Maximum brake speed.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Motor Ratio: sprocket teeth count for gear ratio calculation (motor:dyno) -->
+        <div class="tab-pane fade" id="v-pills-motor-ratio" role="tabpanel" aria-labelledby="v-pills-motor-ratio-tab">
+          <div class="row justify-content-center">
+            <div class="col-md-4">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-gear-wide-connected me-2"></i>Motor Ratio
+                </h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="motor-ratio-input" class="form-label fw-bold">Motor sprocket teeth</label>
+                    <input class="form-control" id="motor-ratio-input" aria-describedby="motor-ratio-input-help"
+                      title="Number of teeth on the motor sprocket" data-bs-toggle="tooltip">
+                    <div class="form-text" id="motor-ratio-input-help">Number of teeth on motor.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dynoRatioInput" class="form-label fw-bold">Dyno sprocket teeth</label>
+                    <input class="form-control" id="dyno-ratio-input" aria-describedby="dyno-ratio-input-help"
+                      title="Number of teeth on the dyno sprocket" data-bs-toggle="tooltip">
+                    <div class="form-text" id="dyno-ratio-input-help">Number of teeth on dyno.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Debug: enable debug mode (shows Debug tab in navbar and additional PID data) -->
+        <div class="tab-pane fade" id="v-pills-debug" role="tabpanel" aria-labelledby="v-pills-debug-tab">
+          <div class="row justify-content-center">
+            <div class="col-md-4">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-bug-fill"></i> Debug</h5>
+                <div class="card-body">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="debug-check">
+                    <label class="form-check-label" for="debug-check">
+                      Enabled
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Low-Pass Filters: signal filtering cutoff frequencies for noise reduction -->
+        <div class="tab-pane fade" id="v-pills-filters" role="tabpanel" aria-labelledby="v-pills-filters-tab">
+          <div class="row justify-content-center">
+            <div class="col-md-4">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-reception-2"></i> Low-Pass Filters</h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="speed-low-pass-filter-input" class="form-label fw-bold">Speed low-pass filter
+                      (Hz)</label>
+                    <input class="form-control" id="speed-low-pass-filter-input"
+                      title="Cutoff frequency for speed signal filtering" data-bs-toggle="tooltip">
+                    <div class="form-text">Speed low-pass filter cutoff frequency.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="torque-low-pass-filter-input" class="form-label fw-bold">Torque low-pass filter
+                      (Hz)</label>
+                    <input class="form-control" id="torque-low-pass-filter-input"
+                      title="Cutoff frequency for torque signal filtering" data-bs-toggle="tooltip">
+                    <div class="form-text">Torque low-pass filter cutoff frequency.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="acc-low-pass-filter-input" class="form-label fw-bold">Acceleration low-pass filter
+                      (Hz)</label>
+                    <input class="form-control" id="acc-low-pass-filter-input"
+                      title="Cutoff frequency for acceleration signal filtering" data-bs-toggle="tooltip">
+                    <div class="form-text">Acceleration low-pass filter cutoff frequency.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="output-low-pass-filter-input" class="form-label fw-bold">PID output low-pass filter
+                      (Hz)</label>
+                    <input class="form-control" id="output-low-pass-filter-input"
+                      title="Cutoff frequency for PID output signal filtering" data-bs-toggle="tooltip">
+                    <div class="form-text">PID output low-pass filter cutoff frequency.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PID Configuration: Proportional-Integral-Derivative controller tuning parameters -->
+        <div class="tab-pane fade" id="v-pills-pid" role="tabpanel" aria-labelledby="v-pills-pid-tab">
+          <div class="row">
+            <!-- Torque PID Configuration -->
+            <div class="col-md-4">
+              <div class="card bg-dark h-100">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-graph-up-arrow"></i> Torque PID</h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="torque-kp-input" class="form-label fw-bold">Kp</label>
+                    <input class="form-control" id="torque-kp-input" title="Proportional gain for torque PID controller"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Proportional gain</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="torque-ki-input" class="form-label fw-bold">Ki</label>
+                    <input class="form-control" id="torque-ki-input" title="Integral gain for torque PID controller"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Integral gain</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="torque-kd-input" class="form-label fw-bold">Kd</label>
+                    <input class="form-control" id="torque-kd-input" title="Derivative gain for torque PID controller"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Derivative gain</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Speed PID Configuration -->
+            <div class="col-md-4">
+              <div class="card bg-dark h-100">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-graph-up-arrow"></i> Speed PID</h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="speed-kp-input" class="form-label fw-bold">Kp</label>
+                    <input class="form-control" id="speed-kp-input" title="Proportional gain for speed PID controller"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Proportional gain</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="speed-ki-input" class="form-label fw-bold">Ki</label>
+                    <input class="form-control" id="speed-ki-input" title="Integral gain for speed PID controller"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Integral gain</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="speed-kd-input" class="form-label fw-bold">Kd</label>
+                    <input class="form-control" id="speed-kd-input" title="Derivative gain for speed PID controller"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Derivative gain</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic PID Configuration -->
+            <div class="col-md-4">
+              <div class="card bg-dark h-100">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-graph-up-arrow"></i> Dynamic PID</h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="dynamic-kp-input" class="form-label fw-bold">Kp</label>
+                    <input class="form-control" id="dynamic-kp-input"
+                      title="Proportional gain for dynamic PID controller" data-bs-toggle="tooltip">
+                    <div class="form-text">Proportional gain</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dynamic-ki-input" class="form-label fw-bold">Ki</label>
+                    <input class="form-control" id="dynamic-ki-input" title="Integral gain for dynamic PID controller"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Integral gain</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dynamic-kd-input" class="form-label fw-bold">Kd</label>
+                    <input class="form-control" id="dynamic-kd-input" title="Derivative gain for dynamic PID controller"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Derivative gain</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inertia & Loads: physical inertia values and load parameters -->
+        <div class="tab-pane fade" id="v-pills-inertia" role="tabpanel" aria-labelledby="v-pills-inertia-tab">
+          <div class="row justify-content-center">
+            <div class="col-md-4">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-arrow-repeat"></i> Inertia and Loads</h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="dyno-inertia-input" class="form-label fw-bold">Dyno inertia</label>
+                    <input class="form-control" id="dyno-inertia-input"
+                      title="Moment of inertia of the eddy current brake (kg·m²)" data-bs-toggle="tooltip">
+                    <div class="form-text">Eddy current brake inertia (kg·m²).</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="chain-inertia-input" class="form-label fw-bold">Chain inertia</label>
+                    <input class="form-control" id="chain-inertia-input"
+                      title="Moment of inertia of the chain and sprockets (kg·m²)" data-bs-toggle="tooltip">
+                    <div class="form-text">Chain and sprocket system inertia (kg·m²).</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="fan-load-input" class="form-label fw-bold">Fan load</label>
+                    <input class="form-control" id="fan-load-input" title="Fan load parameter (currently unused)"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Currently unused.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Load Cell: calibration parameters for torque measurement (gain, scale, offset, arm length) -->
+        <div class="tab-pane fade" id="v-pills-load-cell" role="tabpanel" aria-labelledby="v-pills-load-cell-tab">
+          <div class="row justify-content-center">
+            <div class="col-md-4">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-box-arrow-down"></i> Load Cell Configuration
+                </h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="load-cell-gain-input" class="form-label fw-bold">Gain</label>
+                    <input class="form-control" id="load-cell-gain-input"
+                      title="Amplifier gain setting for the load cell" data-bs-toggle="tooltip">
+                    <div class="form-text">Load cell amplifier gain.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="load-cell-scale-input" class="form-label fw-bold">Scale</label>
+                    <input class="form-control" id="load-cell-scale-input"
+                      title="Calibration factor to convert raw values to force/torque units" data-bs-toggle="tooltip">
+                    <div class="form-text">Calibration scale factor.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="load-cell-offset-input" class="form-label fw-bold">Offset</label>
+                    <input class="form-control" id="load-cell-offset-input" title="Zero offset in raw ADC counts"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Zero offset (raw ADC counts).</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="load-cell-distance-input" class="form-label fw-bold">Load cell arm</label>
+                    <input class="form-control" id="load-cell-distance-input"
+                      title="Distance from pivot to load cell mounting point (meters)" data-bs-toggle="tooltip">
+                    <div class="form-text">Load cell arm in meters</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PWM Configuration: pulse-width modulation settings for brake control output -->
+        <div class="tab-pane fade" id="v-pills-pwm" role="tabpanel" aria-labelledby="v-pills-pwm-tab">
+          <div class="row justify-content-center">
+            <div class="col-md-4">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-reception-4"></i> PWM Configuration</h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="pwm-frequency-input" class="form-label fw-bold">PWM Frequency (Hz)</label>
+                    <input class="form-control" id="pwm-frequency-input" title="PWM signal frequency in Hertz"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">PWM signal frequency.
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="pwm-start-input" class="form-label fw-bold">PWM Start Value</label>
+                    <input class="form-control" id="pwm-start-input" title="Initial PWM duty cycle value (0-1000)"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Initial duty cycle (0-1000).
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="pwm-limit-input" class="form-label fw-bold">PWM Limit</label>
+                    <input class="form-control" id="pwm-limit-input" title="Maximum allowed PWM duty cycle (0-1000)"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Maximum duty cycle limit (0-1000).
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graph Configuration: axis limits and display settings for all chart types -->
+        <div class="tab-pane fade" id="v-pills-graph" role="tabpanel" aria-labelledby="v-pills-graph-tab"
+          style="margin-bottom: 20px;">
+          <div class="row">
+            <!-- Live Graph: real-time chart display settings -->
+            <div class="col-md-3">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-cast"></i> Live Graph</h5>
+                <div class="card-body" style="overflow-y: auto;">
+                  <div class="mb-3">
+                    <label for="live-graph-max-points-input" class="form-label fw-bold">Max points</label>
+                    <input class="form-control" id="live-graph-max-points-input"
+                      title="Maximum data points to display (older points removed when exceeded)"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Maximum points before scrolling.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="live-graph-torque-min-input" class="form-label fw-bold">Torque min</label>
+                    <input class="form-control" id="live-graph-torque-min-input" title="Minimum value for torque Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="live-graph-torque-max-input" class="form-label fw-bold">Torque max</label>
+                    <input class="form-control" id="live-graph-torque-max-input" title="Maximum value for torque Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="live-graph-speed-min-input" class="form-label fw-bold">Speed min</label>
+                    <input class="form-control" id="live-graph-speed-min-input" title="Minimum value for speed Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Speed axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="live-graph-speed-max-input" class="form-label fw-bold">Speed max</label>
+                    <input class="form-control" id="live-graph-speed-max-input" title="Maximum value for speed Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Speed axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="live-graph-power-min-input" class="form-label fw-bold">Power min</label>
+                    <input class="form-control" id="live-graph-power-min-input" title="Minimum value for power Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Power axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="live-graph-power-max-input" class="form-label fw-bold">Power max</label>
+                    <input class="form-control" id="live-graph-power-max-input" title="Maximum value for power Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Power axis maximum.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Speed Graph: constant speed test chart settings -->
+            <div class="col-md-3">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-speedometer2"></i> Speed Graph</h5>
+                <div class="card-body" style="overflow-y: auto;">
+                  <div class="mb-3">
+                    <label for="speed-graph-max-points-input" class="form-label fw-bold">Max points</label>
+                    <input class="form-control" id="speed-graph-max-points-input"
+                      title="Maximum data points to display (older points removed when exceeded)"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Maximum points before scrolling.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="speed-graph-torque-min-input" class="form-label fw-bold">Torque min</label>
+                    <input class="form-control" id="speed-graph-torque-min-input"
+                      title="Minimum value for torque Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="speed-graph-torque-max-input" class="form-label fw-bold">Torque max</label>
+                    <input class="form-control" id="speed-graph-torque-max-input"
+                      title="Maximum value for torque Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="speed-graph-speed-min-input" class="form-label fw-bold">Speed min</label>
+                    <input class="form-control" id="speed-graph-speed-min-input" title="Minimum value for speed Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Speed axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="speed-graph-speed-max-input" class="form-label fw-bold">Speed max</label>
+                    <input class="form-control" id="speed-graph-speed-max-input" title="Maximum value for speed Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Speed axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="speed-graph-power-min-input" class="form-label fw-bold">Power min</label>
+                    <input class="form-control" id="speed-graph-power-min-input" title="Minimum value for power Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Power axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="speed-graph-power-max-input" class="form-label fw-bold">Power max</label>
+                    <input class="form-control" id="speed-graph-power-max-input" title="Maximum value for power Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Power axis maximum.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Torque Graph: constant torque test chart settings -->
+            <div class="col-md-3">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-tropical-storm"></i> Torque Graph</h5>
+                <div class="card-body" style="overflow-y: auto;">
+                  <div class="mb-3">
+                    <label for="torque-graph-max-points-input" class="form-label fw-bold">Max points</label>
+                    <input class="form-control" id="torque-graph-max-points-input"
+                      title="Maximum data points to display (older points removed when exceeded)"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Maximum points before scrolling.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="torque-graph-torque-min-input" class="form-label fw-bold">Torque min</label>
+                    <input class="form-control" id="torque-graph-torque-min-input"
+                      title="Minimum value for torque Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="torque-graph-torque-max-input" class="form-label fw-bold">Torque max</label>
+                    <input class="form-control" id="torque-graph-torque-max-input"
+                      title="Maximum value for torque Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="torque-graph-speed-min-input" class="form-label fw-bold">Speed min</label>
+                    <input class="form-control" id="torque-graph-speed-min-input" title="Minimum value for speed Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Speed axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="torque-graph-speed-max-input" class="form-label fw-bold">Speed max</label>
+                    <input class="form-control" id="torque-graph-speed-max-input" title="Maximum value for speed Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Speed axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="torque-graph-power-min-input" class="form-label fw-bold">Power min</label>
+                    <input class="form-control" id="torque-graph-power-min-input" title="Minimum value for power Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Power axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="torque-graph-power-max-input" class="form-label fw-bold">Power max</label>
+                    <input class="form-control" id="torque-graph-power-max-input" title="Maximum value for power Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Power axis maximum.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Graph: dynamic/acceleration test chart settings -->
+            <div class="col-md-3">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-arrow-repeat"></i> Dynamic Graph</h5>
+                <div class="card-body" style="overflow-y: auto;">
+                  <div class="mb-3">
+                    <label for="dynamic-graph-max-points-input" class="form-label fw-bold">Max points</label>
+                    <input class="form-control" id="dynamic-graph-max-points-input"
+                      title="Maximum data points to display (older points removed when exceeded)"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Maximum points before scrolling.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dynamic-graph-torque-min-input" class="form-label fw-bold">Torque min</label>
+                    <input class="form-control" id="dynamic-graph-torque-min-input"
+                      title="Minimum value for torque Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dynamic-graph-torque-max-input" class="form-label fw-bold">Torque max</label>
+                    <input class="form-control" id="dynamic-graph-torque-max-input"
+                      title="Maximum value for torque Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dynamic-graph-power-min-input" class="form-label fw-bold">Power min</label>
+                    <input class="form-control" id="dynamic-graph-power-min-input"
+                      title="Minimum value for power Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Power axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dynamic-graph-power-max-input" class="form-label fw-bold">Power max</label>
+                    <input class="form-control" id="dynamic-graph-power-max-input"
+                      title="Maximum value for power Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Power axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dynamic-graph-rpm-min-input" class="form-label fw-bold">RPM min</label>
+                    <input class="form-control" id="dynamic-graph-rpm-min-input" title="Minimum value for RPM X-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">RPM axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dynamic-graph-rpm-max-input" class="form-label fw-bold">RPM max</label>
+                    <input class="form-control" id="dynamic-graph-rpm-max-input" title="Maximum value for RPM X-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">RPM axis maximum.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Debug Graph: PID debugging chart settings (PWM, torque, speed, acceleration) -->
+        <div class="tab-pane fade" id="v-pills-debug-graph" role="tabpanel" aria-labelledby="v-pills-debug-graph-tab">
+          <div class="card bg-dark">
+            <h5 class="card-header fw-bold text-center"><i class="bi bi-bug-fill"></i> Debug Graph</h5>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="debug-graph-max-pwm-input" class="form-label fw-bold">Max PWM</label>
+                    <input class="form-control" id="debug-graph-max-pwm-input" title="Maximum PWM value for Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">PWM axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="debug-graph-min-pwm-input" class="form-label fw-bold">Min PWM</label>
+                    <input class="form-control" id="debug-graph-min-pwm-input" title="Minimum PWM value for Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">PWM axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="debug-graph-max-torque-input" class="form-label fw-bold">Max torque</label>
+                    <input class="form-control" id="debug-graph-max-torque-input"
+                      title="Maximum torque value for Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis maximum.</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="debug-graph-min-torque-input" class="form-label fw-bold">Min torque</label>
+                    <input class="form-control" id="debug-graph-min-torque-input"
+                      title="Minimum torque value for Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Torque axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="debug-graph-max-speed-input" class="form-label fw-bold">Max speed</label>
+                    <input class="form-control" id="debug-graph-max-speed-input" title="Maximum speed value for Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Speed axis maximum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="debug-graph-min-speed-input" class="form-label fw-bold">Min speed</label>
+                    <input class="form-control" id="debug-graph-min-speed-input" title="Minimum speed value for Y-axis"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Speed axis minimum.</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="debug-graph-max-points-input" class="form-label fw-bold">Max points</label>
+                    <input class="form-control" id="debug-graph-max-points-input"
+                      title="Maximum data points to display (older points removed when exceeded)"
+                      data-bs-toggle="tooltip">
+                    <div class="form-text">Maximum points before scrolling.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="debug-graph-min-acc-input" class="form-label fw-bold">Min acceleration</label>
+                    <input class="form-control" id="debug-graph-min-acc-input"
+                      title="Minimum acceleration value for Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Acceleration axis minimum.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="debug-graph-max-acc-input" class="form-label fw-bold">Max acceleration</label>
+                    <input class="form-control" id="debug-graph-max-acc-input"
+                      title="Maximum acceleration value for Y-axis" data-bs-toggle="tooltip">
+                    <div class="form-text">Acceleration axis maximum.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAN Interface Configuration -->
+        <div class="tab-pane fade" id="v-pills-can-interface" role="tabpanel" aria-labelledby="v-pills-can-interface-tab">
+          <div class="row justify-content-center">
+            <div class="col-md-4">
+              <div class="card bg-dark">
+                <h5 class="card-header fw-bold text-center"><i class="bi bi-usb-symbol me-2"></i> CAN Interface</h5>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="can-mode-input" class="form-label fw-bold">Mode</label>
+                    <select class="form-control" id="can-mode-input" title="Select CAN connection mode"
+                      data-bs-toggle="tooltip">
+                      <option value="slcan">Serial CAN (slcan)</option>
+                      <option value="native">Native CAN (canX)</option>
+                    </select>
+                    <div class="form-text">Connection mode to the CAN bus.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="can-channel-input" class="form-label fw-bold">Interface</label>
+                    <select class="form-control" id="can-channel-input" title="Select the interface port"
+                      data-bs-toggle="tooltip">
+                      <!-- Populated dynamically -->
+                    </select>
+                    <div class="form-text" id="can-channel-input-help">The physical interface or serial port.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="can-bitrate-input" class="form-label fw-bold">Bitrate</label>
+                    <select class="form-control" id="can-bitrate-input" title="Select the CAN bus bitrate"
+                      data-bs-toggle="tooltip">
+                      <option value="125000">125 kbps</option>
+                      <option value="250000">250 kbps</option>
+                      <option value="500000">500 kbps</option>
+                      <option value="1000000">1 Mbps</option>
+                    </select>
+                    <div class="form-text">Bitrate must match the DynoLogic firmware.</div>
+                  </div>
+                  <div class="d-flex justify-content-center mt-3">
+                    <button type="button" class="btn btn-primary fw-bold" id="reconnect-can-btn"><i class="bi bi-plugin me-2"></i>Apply & Reconnect</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+<!-- Configuration page JavaScript - handles form validation, save/load, CAN communication -->
+{% block final %}
+<script src="{{ url_for('static', filename='js/app/configuration.js')}}"></script>
+{% endblock %}

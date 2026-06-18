@@ -1,0 +1,590 @@
+{% extends "base.html" %}
+{% block headers %}
+
+<!-- Debug page custom styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app/debug.css') }}">
+<!-- uPlot: lightweight charting library for real-time data visualization -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/vendor/uPlot/uPlot.min.css')}}">
+
+<!-- uPlot library for performance-critical real-time charting -->
+<script src="{{ url_for('static', filename='js/uPlot.iife.js') }}"></script>
+
+{% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col">
+            <!-- Control Panel: 6 cards for system adjustment -->
+            <div class="card bg-dark text-white mb-2">
+                <div class="card-header fw-bold text-center">
+                    Control
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <!-- Card 1: Test run control and mode selection -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Mode</div>
+                                <div class="card-body d-flex flex-column justify-content-center "
+                                    style="font-size: 5px">
+                                    <div class="text-start"
+                                        style="padding-top: 1px; padding-bottom: 8px; margin-bottom: 0; position: sticky; top: 40px; padding-left: 10px; padding-right: 10px;">
+
+                                        <button id="run-test" type="button" class="btn btn-success w-100">Run
+                                            test</button>
+                                        <div class="form-group mt-1">
+                                            <label for="startSpeed" class="fw-bold small"
+                                                style="font-size: 0.95rem;">Mode</label>
+                                            <select class="form-control bg-dark text-white form-select form-select-sm"
+                                                id="modeInput" data-bs-toggle="tooltip"
+                                                title="Select the test run mode (Dynamic, Constant Speed, or Constant Torque)">
+                                                <option>Dynamic</option>
+                                                <option>Constant speed</option>
+                                                <option>Constant torque</option>
+                                            </select>
+                                        </div>
+                                        <div id="run-alert" class="mt-2"></div> <!-- Message area -->
+                                        <div class="form-group" id="modeValueForm">
+                                            <label for="endSpeed" class="fw-bold"
+                                                style="font-size: 0.95rem;">Value</label>
+                                            <input type="number" class="form-control bg-dark text-white"
+                                                id="runModeValueInput" aria-describedby="endSpeedHelp"
+                                                placeholder="End speed" data-bs-toggle="tooltip"
+                                                title="Set the target value for the selected mode (RPM for speed, Nm for torque)">
+                                            <small id="modeValueHelp" class="form-text text-white"
+                                                style="font-size: 0.95rem;">Torque in Nm. Speed in rpm.</small>
+                                        </div>
+                                        <div class="form-group mt-2">
+                                            <input type="range" class="form-range" id="modeValueRange" min="500"
+                                                max="3000" step="1">
+                                        </div>
+                                        <button id="save-run-mode" class="btn btn-primary center"
+                                            style="width: 100%;"><i class="bi bi-floppy"></i> Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Torque PID controller tuning -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Torque PID config</div>
+                                <div class="card-body d-flex flex-column text-start" style="font-size: 5px">
+                                    <div class="form-group" id="modeValueForm">
+                                        <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Kp</label>
+                                        <input type="number" class="form-control bg-dark text-white" id="torqueKpInput"
+                                            aria-describedby="endSpeedHelp" placeholder="End speed" step="0.001"
+                                            data-bs-toggle="tooltip" title="Proportional gain for torque control PID">
+                                        <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Ki</label>
+                                        <input type="number" class="form-control bg-dark text-white" id="torqueKiInput"
+                                            aria-describedby="endSpeedHelp" placeholder="End speed" step="0.001"
+                                            data-bs-toggle="tooltip" title="Integral gain for torque control PID">
+                                        <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Kd</label>
+                                        <input type="number" class="form-control bg-dark text-white" id="torqueKdInput"
+                                            aria-describedby="endSpeedHelp" placeholder="End speed" step="0.001"
+                                            data-bs-toggle="tooltip" title="Derivative gain for torque control PID">
+                                        <button id="save-torque-pid-config" class="btn btn-primary center mt-2"
+                                            style="width: 100%;"><i class="bi bi-floppy"></i> Save</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Speed PID controller tuning -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Speed PID config</div>
+                                <div class="card-body d-flex flex-column text-start" style="font-size: 5px">
+                                    <div class="form-group" id="modeValueForm">
+                                        <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Kp</label>
+                                        <input type="number" class="form-control bg-dark text-white" id="speedKpInput"
+                                            aria-describedby="endSpeedHelp" placeholder="End speed" step="0.00001"
+                                            data-bs-toggle="tooltip" title="Proportional gain for speed control PID">
+
+                                        <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Ki</label>
+                                        <input type="number" class="form-control bg-dark text-white" id="speedKiInput"
+                                            aria-describedby="endSpeedHelp" placeholder="End speed" step="0.00001"
+                                            data-bs-toggle="tooltip" title="Integral gain for speed control PID">
+
+                                        <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Kd</label>
+                                        <input type="number" class="form-control bg-dark text-white" id="speedKdInput"
+                                            aria-describedby="endSpeedHelp" placeholder="End speed" step="0.00001"
+                                            data-bs-toggle="tooltip" title="Derivative gain for speed control PID">
+                                        <button id="save-speed-pid-config" class="btn btn-primary center mt-2"
+                                            style="width: 100%;"><i class="bi bi-floppy"></i> Save</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Dynamic PID controller tuning -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Dynamic PID config</div>
+                                <div class="card-body d-flex flex-column text-start" style="font-size: 5px">
+                                    <div class="form-group" id="modeValueForm">
+                                        <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Kp</label>
+                                        <input type="number" class="form-control bg-dark text-white" id="dynamicKpInput"
+                                            aria-describedby="endSpeedHelp" placeholder="End speed" step="0.001"
+                                            data-bs-toggle="tooltip" title="Proportional gain for dynamic mode PID">
+                                        <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Ki</label>
+                                        <input type="number" class="form-control bg-dark text-white" id="dynamicKiInput"
+                                            aria-describedby="endSpeedHelp" placeholder="End speed" step="0.001"
+                                            data-bs-toggle="tooltip" title="Integral gain for dynamic mode PID">
+                                        <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Kd</label>
+                                        <input type="number" class="form-control bg-dark text-white" id="dynamicKdInput"
+                                            aria-describedby="endSpeedHelp" placeholder="End speed" step="0.001"
+                                            data-bs-toggle="tooltip" title="Derivative gain for dynamic mode PID">
+                                        <button id="save-dynamic-pid-config" class="btn btn-primary center mt-2"
+                                            style="width: 100%;"><i class="bi bi-floppy"></i> Save</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Card 5: Load cell calibration and tare -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Load cell</div>
+                                <div class="card-body d-flex flex-column text-start" style="font-size: 5px;">
+                                    <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Gain</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="loadCellGain"
+                                        aria-describedby="endSpeedHelp" placeholder="End speed" step="0.001"
+                                        data-bs-toggle="tooltip" title="Amplifier gain for load cell signal">
+                                    <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Scale</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="loadCellScale"
+                                        step="0.01" data-bs-toggle="tooltip"
+                                        title="Calibration scale factor for load cell readings">
+                                    <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Offset</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="loadCellOffset"
+                                        step="0.01" data-bs-toggle="tooltip" title="Zero offset for load cell readings">
+                                    <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">Distance</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="loadCellDistance"
+                                        step="0.01" data-bs-toggle="tooltip"
+                                        title="Distance from brake center to load cell (for torque calculation)">
+                                    <button id="tare-load-cell" class="btn btn-primary center mt-2"
+                                        style="width: 100%;"><i class="bi bi-rulers"></i> Tare</button>
+                                    <button id="save-load-cell-config" class="btn btn-primary center mt-2"
+                                        style="width: 100%;"><i class="bi bi-floppy"></i> Save</button>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Card 6: Direct PWM control for manual brake adjustment -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">PWM control</div>
+                                <div class="card-body d-flex flex-column text-start" style="font-size: 5px;">
+                                    <label for="endSpeed" class="fw-bold" style="font-size: 0.95rem;">PWM value</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="pwm-value"
+                                        aria-describedby="endSpeedHelp" placeholder="End speed" step="1" value="0"
+                                        data-bs-toggle="tooltip" title="Direct PWM control value (0-100%)">
+                                    <small id="modeValueHelp" class="form-text text-white" style="font-size: 0.95rem;">0
+                                        to 100</small>
+                                    <button id="save-pwm-config" class="btn btn-primary center mt-2"
+                                        style="width: 100%;"><i class="bi bi-floppy"></i> Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- .row -->
+                </div> <!-- .card-body -->
+            </div> <!-- .card -->
+
+            <!-- PID Data Chart: real-time plot of setpoint, PWM, torque, speed, acceleration -->
+            <div class="card bg-dark text-white mb-2">
+                <div class="card-header position-relative">
+                    <div class="fw-bold text-center">
+                        PID Data
+                    </div>
+                    <!-- Chart control buttons: FFT, Pause, Reset, and Configuration -->
+                    <div class="position-absolute end-0 top-50 translate-middle-y d-flex align-items-center me-2">
+                        <!-- Reset Button -->
+                        <button type="button" class="btn btn-warning py-1 me-2" style="font-size: 0.8rem; width: auto;"
+                            id="fft-graph">
+                            <i class="bi bi-graph-down"></i> FFT
+                        </button>
+                        <button type="button" class="btn btn-warning py-1 me-2" style="font-size: 0.8rem; width: auto;"
+                            id="pause-graph">
+                            <i class="bi bi-pause-btn"></i> Pause
+                        </button>
+                        <button type="button" class="btn btn-warning py-1 me-2" style="font-size: 0.8rem; width: auto;"
+                            id="reset-graph"><i class="bi bi-recycle"></i>
+                            Reset
+                        </button>
+                        <!-- Graph Config Button -->
+                        <button type="button" class="btn btn-warning py-1" data-bs-toggle="modal"
+                            data-bs-target="#graph-config-modal" style="font-size: 0.8rem; width: auto;"><i
+                                class="bi bi-gear"></i>
+                            Graph Configuration
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row" style="height: 470px;">
+                        <!-- Added min-height: 0 for proper flex sizing -->
+                        <div class="bg-white"> <!-- Added padding here -->
+                            <div id="chart-container" style="width: 100%; height: 100%; padding-bottom: 20px;">
+                                <div id="chart" style="width: 100%; height: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- .card-body -->
+                <!-- Resize Handle: drag bottom of chart to resize -->
+                <div class="resize-handle" id="chart-resize-handle" title="Drag to resize"></div>
+            </div> <!-- .card -->
+
+            <!-- Eddy Current Brake Real-time Data Display -->
+            <div class="card bg-dark text-white mb-2">
+                <div class="card-header fw-bold text-center">
+                    Eddy Current Brake Data
+                </div>
+                <div class="card-body ">
+                    <!-- Row 1: Mechanical data (speed, load cell, acceleration, setpoint) -->
+                    <div class="row g-2">
+                        <!-- Brake speed -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Speed</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="speed" style="font-size: calc(1rem + 3vh);">-
+                                    </h1>
+                                    <span class="fs-5 text-white ms-2">rpm</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Load cell -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Load Cell</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="torque" style="font-size: calc(1rem + 3vh);">-
+                                    </h1>
+                                    <span class="fs-5 text-white ms-2">Kg</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Brake Torque -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Brake Torque</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="brake-torque"
+                                        style="font-size: calc(1rem + 3vh);">
+                                        -
+                                    </h1>
+                                    <span class="fs-5 text-white ms-2">Nm</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Brake Acceleration -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Acceleration</div>
+                                <div class="card-body d-flex flex-column justify-content-center">
+                                    <h1 class="display-6 fw-bold" id="brake-acc" style="font-size: calc(1rem + 3vh);">-
+                                    </h1>
+                                    <span class="fs-5 text-white ms-2">RPM/s</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Brake Setpoint -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Setpoint</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="brake-setpoint"
+                                        style="font-size: calc(1rem + 3vh);">-
+                                    </h1>
+                                    <span class="fs-5 text-white ms-2">rpm/Nm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <!-- Row 2: Electrical data (voltage, current, PWM, temperature) -->
+                    <div class="row g-2">
+                        <!-- Brake Voltage -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Voltage</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="voltage" style="font-size: calc(1rem + 3vh);">
+                                        -</h1>
+                                    <span class="fs-6 text-white ms-2" id="logMaxPowerRpm">V</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Brake Current -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Current</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="current" style="font-size: calc(1rem + 3vh);">
+                                        -</h1>
+                                    <span class="fs-6 text-white ms-2" id="logMaxPowerRpm">A</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Brake PWM -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">PWM</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="pwm" style="font-size: calc(1rem + 3vh);">-
+                                    </h1>
+                                    <span class="fs-5 text-white ms-2">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Brake Temperature -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Temperature</div>
+                                <div class="card-body d-flex flex-column justify-content-center">
+                                    <h1 class="display-6 fw-bold" id="brakeTemperature"
+                                        style="font-size: calc(1rem + 3vh);">-</h1>
+                                    <span class="fs-5 text-white ms-2">°C</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- DynoPower Temp -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">DynoPower Temp</div>
+                                <div class="card-body d-flex flex-column justify-content-center">
+                                    <h1 class="display-6 fw-bold" id="elec-temp-value"
+                                        style="font-size: calc(1rem + 3vh);">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Motor Calculated Data: brake values converted using gear ratio -->
+            <div class="card bg-dark text-white mb-2">
+                <div class="card-header fw-bold text-center">
+                    Motor Data
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <!-- Motor speed -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Speed</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="motor-speed" style="font-size: calc(1rem + 3vh);">
+                                        -
+                                    </h1>
+                                    <span class="fs-5 text-white ms-2">RPM</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Motor Torque -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Torque (No Inertia)</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="motor-torque"
+                                        style="font-size: calc(1rem + 3vh);">-
+                                    </h1>
+                                    <span class="fs-5 text-white ms-2">Nm</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Motor Acceleration -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Acceleration</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="motor-acc" style="font-size: calc(1rem + 3vh);">
+                                        -</h1>
+                                    <span class="fs-6 text-white ms-2" id="logMaxPowerRpm">RPM/s</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Motor Setpoint -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Setpoint</div>
+                                <div class="card-body d-flex flex-column justify-content-center"
+                                    style="font-size: calc(1rem + 2vh);">
+                                    <h1 class="display-6 fw-bold" id="motor-setpoint"
+                                        style="font-size: calc(1rem + 3vh);">-
+                                    </h1>
+                                    <span class="fs-6 text-white ms-2" id="logMaxPowerRpm">RPM/Nm/RPM/s</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Motor Power -->
+                        <div class="col d-flex flex-column">
+                            <div class="card text-white bg-dark text-center h-100 border-custom">
+                                <div class="card-header fw-bold">Power</div>
+                                <div class="card-body d-flex flex-column justify-content-center">
+                                    <h1 class="display-6 fw-bold" id="motor-power" style="font-size: calc(1rem + 3vh);">
+                                        -</h1>
+                                    <span class="fs-5 text-white ms-2" id="power-unit-label">kW</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graph Configuration Modal: set axis limits for debug chart -->
+<div class="modal fade" id="graph-config-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header" style="border-bottom: 2px solid #F0B823;">
+                <h1 class="modal-title fs-5 fw-bold">Graph Configuration</h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <!-- PWM Card -->
+                    <div class="col-md-6 col-lg-2 d-flex flex-column">
+                        <div class="card text-white bg-dark text-center h-100 border-custom">
+                            <div class="card-header fw-bold">PWM Configuration</div>
+                            <div class="card-body d-flex flex-column text-start" style="font-size: 0.9rem">
+                                <div class="form-group">
+                                    <label for="maxPwmInput" class="fw-bold">Max PWM</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="maxPwmInput"
+                                        data-bs-toggle="tooltip" title="Maximum PWM value for graph Y-axis">
+                                    <label for="minPwmInput" class="fw-bold mt-2">Min PWM</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="minPwmInput"
+                                        data-bs-toggle="tooltip" title="Minimum PWM value for graph Y-axis">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Torque Card -->
+                    <div class="col-md-6 col-lg-2 d-flex flex-column">
+                        <div class="card text-white bg-dark text-center h-100 border-custom">
+                            <div class="card-header fw-bold">Torque Configuration</div>
+                            <div class="card-body d-flex flex-column text-start" style="font-size: 0.9rem">
+                                <div class="form-group">
+                                    <label for="maxTorqueInput" class="fw-bold">Max Torque</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="maxTorqueInput"
+                                        data-bs-toggle="tooltip" title="Maximum torque value for graph Y-axis">
+                                    <label for="minTorqueInput" class="fw-bold mt-2">Min Torque</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="minTorqueInput"
+                                        data-bs-toggle="tooltip" title="Minimum torque value for graph Y-axis">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Speed Card -->
+                    <div class="col-md-6 col-lg-2 d-flex flex-column">
+                        <div class="card text-white bg-dark text-center h-100 border-custom">
+                            <div class="card-header fw-bold">Speed Configuration</div>
+                            <div class="card-body d-flex flex-column text-start" style="font-size: 0.9rem">
+                                <div class="form-group">
+                                    <label for="maxSpeedInput" class="fw-bold">Max Speed</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="maxSpeedInput"
+                                        data-bs-toggle="tooltip" title="Maximum speed value for graph Y-axis">
+                                    <label for="minSpeedInput" class="fw-bold mt-2">Min Speed</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="minSpeedInput"
+                                        data-bs-toggle="tooltip" title="Minimum speed value for graph Y-axis">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-2 d-flex flex-column">
+                        <div class="card text-white bg-dark text-center h-100 border-custom">
+                            <div class="card-header fw-bold">Acceleration Configuration</div>
+                            <div class="card-body d-flex flex-column text-start" style="font-size: 0.9rem">
+                                <div class="form-group">
+                                    <label for="maxAccInput" class="fw-bold">Max Acceleration</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="maxAccInput"
+                                        data-bs-toggle="tooltip" title="Maximum acceleration value for graph Y-axis">
+                                    <label for="minAccInput" class="fw-bold mt-2">Min Acceleration</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="minAccInput"
+                                        data-bs-toggle="tooltip" title="Minimum acceleration value for graph Y-axis">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Time Card -->
+                    <div class="col-md-6 col-lg-2 d-flex flex-column">
+                        <div class="card text-white bg-dark text-center h-100 border-custom">
+                            <div class="card-header fw-bold">Time Configuration</div>
+                            <div class="card-body d-flex flex-column text-start" style="font-size: 0.9rem">
+                                <div class="form-group">
+                                    <label for="maxPointsInput" class="fw-bold">Max Points</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="maxPointsInput"
+                                        data-bs-toggle="tooltip"
+                                        title="Maximum number of data points to display before scrolling">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 2px solid #F0B823;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Close</button>
+                <button id="save-graph-config" type="button" class="btn btn-primary"><i class="bi bi-floppy"></i>
+                    Save
+                    All</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FFT Analysis Modal: frequency domain analysis of speed/torque signals -->
+<div class="modal fade" id="fftModal" tabindex="-1" aria-labelledby="fftModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header" style="border-bottom: 2px solid #F0B823;">
+                <h5 class="modal-title fw-bold" id="fftModalLabel"><i class="bi bi-graph-down me-2"></i>FFT of Speed</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-end mb-2">
+                    <button class="btn btn-outline-warning btn-sm me-2" id="select-speed">Speed</button>
+                    <button class="btn btn-outline-warning btn-sm" id="select-torque">Torque</button>
+                </div>
+
+                <div id="fft-chart" style="width: 100%; height: 350px; padding-bottom: 20px;"></div>
+                <style>
+                    #fft-chart .u-legend td { color: #ffffff !important; }
+                    #fft-chart .u-legend .u-label { color: #ffffff !important; }
+                    #fft-chart .u-legend th { color: #ffffff !important; }
+                </style>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- JavaScript for debug page -->
+{% block final %}
+
+<!-- uPlot chart wrapper and initialization -->
+<script src="{{ url_for('static', filename='js/app/debug-chart.js')}}"></script>
+<!-- Debug page logic: PID control, data display, modals -->
+<script src="{{ url_for('static', filename='js/app/debug.js')}}"></script>
+<!-- DSP.js: Digital Signal Processing library for FFT analysis -->
+<script src="https://cdn.jsdelivr.net/gh/corbanbrook/dsp.js/dsp.js"></script>
+
+{% endblock %}

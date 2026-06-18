@@ -1,0 +1,127 @@
+/* ============================================================
+   LOGS PAGE STYLES
+   Page-specific styles for the test logs management interface
+   Common list-group styles inherited from base.css
+   ============================================================ */
+
+/* ============================================================
+   CARD HEADER OVERRIDE
+   1px border for smaller cards (overrides 2px from base.css)
+   ============================================================ */
+.card-header {
+    border-bottom: 1px solid var(--dyno-primary);
+}
+
+/* ============================================================
+   DELETE BUTTON
+   Trash icon button with hover warning state
+   ============================================================ */
+.delete-btn {
+    flex-shrink: 0;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.delete-btn:hover {
+    opacity: 1;
+    border: 1px solid red !important;
+    background-color: rgba(255, 0, 0, 0.1) !important;
+}
+
+/* ============================================================
+   COMPARISON MODE
+   Hover effect for logs selected for comparison
+   ============================================================ */
+.list-group-item.comparison-active:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+}
+
+/* ============================================================
+   TEXT TRUNCATION
+   Ellipsis for long log names and comments
+   Fixed max-width prevents overflow in list layout
+   ============================================================ */
+.list-group-item h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.list-group-item p {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.list-group-item small {
+    font-size: 0.75rem;
+}
+
+/* ============================================================
+   CUSTOM TOOLTIPS
+   Pure CSS tooltips for truncated text using pseudo-elements
+   Shows full text on hover with arrow pointer
+   ============================================================ */
+.list-group-item h5[title],
+.list-group-item p[title] {
+    position: relative;
+    cursor: help;
+}
+
+/* Tooltip content box */
+.list-group-item h5[title]:hover::after,
+.list-group-item p[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    white-space: normal;
+    max-width: 400px;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Tooltip arrow (triangle pointing down) */
+.list-group-item h5[title]:hover::before,
+.list-group-item p[title]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 10px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid rgba(0, 0, 0, 0.9);
+    z-index: 1001;
+}
+
+/* ============================================================
+   FLEXBOX LAYOUT
+   Ensures delete button stays fixed while text truncates
+   ============================================================ */
+.list-group-item {
+    display: flex !important;
+    align-items: center !important;
+    position: relative;
+}
+
+.list-group-item .flex-grow-1 {
+    flex: 1;
+    min-width: 0;
+}
+
+.list-group-item .delete-btn {
+    flex-shrink: 0;
+    margin-left: 10px;
+    width: auto;
+}

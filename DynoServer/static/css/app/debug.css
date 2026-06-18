@@ -1,0 +1,69 @@
+/* ============================================================
+   DEBUG PAGE STYLES
+   Page-specific styles for the PID debugging interface
+   Common styles inherited from base.css (cards, forms, buttons)
+   ============================================================ */
+
+/* ============================================================
+   CHART.JS LEGEND OVERRIDES
+   Force black text on chart legends for readability
+   ============================================================ */
+.u-legend {
+    color: #000000 !important;
+}
+
+.u-legend th {
+    color: inherit !important;
+}
+
+/* ============================================================
+   CONTAINER LAYOUT
+   Wider container for debug page to accommodate charts
+   ============================================================ */
+.container {
+    max-width: 95% !important;
+}
+
+/* ============================================================
+   RESIZABLE CARD HANDLE
+   Drag handle for resizing PID Data Card height
+   ============================================================ */
+.resize-handle {
+    height: 8px;
+    background: linear-gradient(to bottom, var(--dyno-border), var(--dyno-bg-dark));
+    border-top: 1px solid #6c757d;
+    cursor: ns-resize;
+    position: relative;
+    transition: background 0.2s ease;
+}
+
+/* Hover state - gold gradient to indicate interactivity */
+.resize-handle:hover {
+    background: linear-gradient(to bottom, var(--dyno-primary), #d4a01f);
+}
+
+/* Visual grip indicator (dashed line in center of handle) */
+.resize-handle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 3px;
+    background: repeating-linear-gradient(to right,
+            #adb5bd,
+            #adb5bd 4px,
+            transparent 4px,
+            transparent 8px);
+    border-radius: 2px;
+}
+
+/* Grip indicator turns dark on hover for contrast */
+.resize-handle:hover::after {
+    background: repeating-linear-gradient(to right,
+            var(--dyno-bg-dark),
+            var(--dyno-bg-dark) 4px,
+            transparent 4px,
+            transparent 8px);
+}

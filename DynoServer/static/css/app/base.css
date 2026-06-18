@@ -1,0 +1,292 @@
+/* ============================================================
+   CUSTOM FONT
+   Retro arcade-style branding font for the application logo
+   ============================================================ */
+@font-face {
+  font-family: 'Barcade Bold';
+  src: url('./fonts/barcadbold.ttf') format('truetype');
+}
+
+/* ============================================================
+   NAVBAR BRANDING
+   Applies custom arcade font to the main navbar brand/logo
+   ============================================================ */
+.navbar-brand {
+  font-family: 'Barcade Bold', sans-serif;
+  font-size: 1.5rem;
+}
+
+/* ============================================================
+   NAVIGATION ACTIVE STATES
+   Custom color (gold) for active navigation links
+   ============================================================ */
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link.show {
+  --bs-navbar-active-color: #F0B823;
+}
+
+/* ============================================================
+   TRACK TOGGLE SWITCHES
+   Custom styling for enable/disable track toggles
+   - Green (checked) = track enabled
+   - Red (unchecked) = track disabled
+   ============================================================ */
+.form-check-input:checked {
+  background-color: #28a745 !important;
+  border-color: #28a745 !important;
+}
+
+.form-check-input:not(:checked) {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+
+/* Switch thumb (circle) always white regardless of state */
+.form-check-input {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='white'/%3e%3c/svg%3e") !important;
+}
+
+/* ============================================================
+   TEMPERATURE INDICATORS
+   Visual feedback for temperature changes
+   ============================================================ */
+.temperature-up {
+  color: red;
+}
+
+.temperature-down {
+  color: blue;
+}
+
+/* ============================================================
+   BODY LAYOUT
+   Top padding prevents content from being hidden under fixed navbar
+   ============================================================ */
+body {
+  padding-top: var(--navbar-height);
+}
+
+/* ============================================================
+   INFO HISTORY DROPDOWN
+   Dropdown for viewing historical system messages/logs
+   ============================================================ */
+.info-history-dropdown {
+  min-width: var(--dropdown-min-width);
+  max-width: 90vw;
+  padding: 15px;
+}
+
+.info-history-textarea {
+  width: 100%;
+  height: var(--history-textarea-height);
+  font-family: monospace;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 10px;
+  resize: vertical;
+}
+
+/* ============================================================
+   DROPDOWN ITEMS
+   Power/unit selection dropdowns match primary button styling
+   ============================================================ */
+.dropdown-item:active,
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #F0B823 !important;
+  color: #000000 !important;
+}
+
+/* ============================================================
+   CSS CUSTOM PROPERTIES (THEME)
+   Centralized color scheme for consistent theming
+   ============================================================ */
+:root {
+  /* Color Palette */
+  --dyno-primary: #F0B823;
+  --dyno-bg-dark: #212529;
+  --dyno-bg-darker: #343a40;
+  --dyno-border: #495057;
+  --dyno-border-light: #535353;
+
+  /* Layout Dimensions */
+  --navbar-height: 62px;
+  --dropdown-min-width: 500px;
+  --history-textarea-height: 300px;
+}
+
+/* ============================================================
+   CUSTOM SCROLLBAR
+   Dark-themed scrollbar to match application UI
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dyno-bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--dyno-bg-darker);
+  border-radius: 4px;
+}
+
+/* ============================================================
+   FORM INPUTS
+   Dark theme for all text inputs, selects, and textareas
+   ============================================================ */
+.form-control {
+  background-color: var(--dyno-bg-dark) !important;
+  color: white !important;
+  border: 1px solid var(--dyno-border) !important;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.form-label,
+.form-text {
+  color: white;
+}
+
+/* ============================================================
+   RANGE SLIDERS
+   Custom styling for slider thumbs across browsers
+   ============================================================ */
+input[type="range"]::-webkit-slider-thumb {
+  background-color: var(--dyno-primary);
+  border: 1px solid #ccc;
+}
+
+input[type="range"]::-moz-range-thumb {
+  background-color: var(--dyno-primary);
+  border: 1px solid #ccc;
+}
+
+/* ============================================================
+   PRIMARY BUTTONS
+   Gold buttons with dark text for high contrast
+   ============================================================ */
+.btn-primary {
+  --bs-btn-border-color: var(--dyno-primary);
+  --bs-btn-bg: var(--dyno-primary);
+  --bs-btn-color: #000000;
+}
+
+.btn-primary:active,
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--dyno-primary) !important;
+  border-color: var(--dyno-primary) !important;
+  color: #000000 !important;
+  filter: brightness(0.9);
+}
+
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: var(--dyno-primary) !important;
+  border-color: var(--dyno-primary) !important;
+  color: #000000 !important;
+  opacity: 0.75;
+}
+
+/* ============================================================
+   CARDS
+   Dark card containers with gold header borders
+   ============================================================ */
+.card-header {
+  border-bottom: 2px solid var(--dyno-primary) !important;
+  color: white;
+  text-align: center;
+}
+
+.card {
+  --bs-card-bg: var(--dyno-bg-dark);
+  --bs-card-color: white;
+  border: 1px solid var(--dyno-border);
+}
+
+/* ============================================================
+   FOCUS STATES
+   Keyboard-accessible focus indicators using :focus-visible
+   Shows outline only for keyboard navigation, not mouse clicks
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--dyno-primary) !important;
+  outline-offset: 2px;
+}
+
+/* Remove default outline for mouse clicks, but keep keyboard focus above */
+:focus:not(:focus-visible) {
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================
+   ACCORDION
+   Collapsible panels with gold active state
+   ============================================================ */
+.accordion {
+  --bs-accordion-active-bg: var(--dyno-primary);
+  --bs-accordion-active-color: #000;
+}
+
+/* Custom accordion chevron icons (gold when collapsed, black when expanded) */
+[data-bs-theme="dark"] .accordion-button::after {
+  --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23F0B823'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000000'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+/* ============================================================
+   LIST GROUPS
+   Styled lists for selectable items (tracks, logs, etc.)
+   ============================================================ */
+.list-group-item {
+  color: white;
+  background-color: var(--dyno-bg-dark);
+  border-color: var(--dyno-primary);
+}
+
+.list-group-item.active {
+  background-color: var(--dyno-primary);
+  color: black;
+  border-color: var(--dyno-primary);
+}
+
+.list-group {
+  --bs-list-group-action-hover-bg: black;
+  --bs-list-group-action-hover-color: white;
+}
+
+/* ============================================================
+   TEXT UTILITIES
+   Override Bootstrap secondary text color for dark theme
+   ============================================================ */
+.text-body-secondary {
+  color: white !important;
+}
+
+.text-body-secondary.active {
+  color: black !important;
+}
+
+/* ============================================================
+   CUSTOM UTILITY CLASSES
+   ============================================================ */
+
+/* Custom border color for generic containers */
+.border-custom {
+  border: 1px solid var(--dyno-border-light) !important;
+}
+
+/* Delete button hover state - red warning indication */
+.delete-btn:hover {
+  border: 1px solid red !important;
+  background-color: rgba(255, 0, 0, 0.1) !important;
+}
