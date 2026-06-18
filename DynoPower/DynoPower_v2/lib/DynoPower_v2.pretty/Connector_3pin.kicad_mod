@@ -1,0 +1,154 @@
+(footprint "Connector_3pin"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "39773-0003-1")
+	(tags "Connector")
+	(property "Reference" "J**"
+		(at -2.54 0 0)
+		(layer "F.SilkS")
+		(uuid "8c3136f7-2c71-415b-9f92-681b02308e73")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Value" "Connector_3pin"
+		(at -2.54 0 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "36f16a63-5a46-420e-be2c-504b1a6415a1")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "85d3a051-fe49-41dd-b749-f7bd0057a865")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0dbe76f0-141e-40ac-895a-c31c0e372ce1")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_rect
+		(start -6.6 -3.25)
+		(end 1.5 3.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "e2326cf1-c960-4c7c-a39d-df0c1e1d250e")
+	)
+	(fp_line
+		(start -6.58 -3.25)
+		(end 1.5 -3.25)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "df93942c-59ae-4398-ae74-f189763b0669")
+	)
+	(fp_line
+		(start -6.58 3.25)
+		(end -6.58 -3.25)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "80c246ab-fef9-45de-92cd-f1e3f0f6a524")
+	)
+	(fp_line
+		(start 1.5 -3.25)
+		(end 1.5 3.25)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "b8cb7400-a3ec-46cd-96f7-03ebded4867b")
+	)
+	(fp_line
+		(start 1.5 3.25)
+		(end -6.58 3.25)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "4ffed4e6-5941-4999-a67d-3b3f7a88baf9")
+	)
+	(fp_text user "${REFERENCE}"
+		(at -2.54 0 0)
+		(layer "F.Fab")
+		(uuid "733e30ad-2574-414c-8d1b-a0f621cfca66")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(pad "1" thru_hole rect
+		(at 0 0)
+		(size 1.65 1.65)
+		(drill 1.1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "2c2cd582-da1b-47bc-879e-113d9af256bc")
+	)
+	(pad "2" thru_hole circle
+		(at -2.54 0)
+		(size 1.65 1.65)
+		(drill 1.1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "79c98f6f-79e1-45d7-81c3-1256974a4c96")
+	)
+	(pad "3" thru_hole circle
+		(at -5.08 0)
+		(size 1.65 1.65)
+		(drill 1.1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8fae169d-9b68-4e0a-9cd4-328b3c2b14a9")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/lib/3pinConnector/39773-0003.stp"
+		(offset
+			(xyz -2.559999904 -0.09000000222 -0.05999999776)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 0 0)
+		)
+	)
+)

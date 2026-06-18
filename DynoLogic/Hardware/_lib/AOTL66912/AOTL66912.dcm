@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP AOTL66912
+D N-Channel 100 V 49A (Ta), 380A (Tc) 8.3W (Ta), 500W (Tc) Surface Mount TOLLA
+K
+F https://www.aosmd.com/sites/default/files/res/packaging_information/TOLLA.pdf
+$ENDCMP
+#
+#End Doc Library

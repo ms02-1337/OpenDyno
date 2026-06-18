@@ -1,0 +1,109 @@
+(footprint "KNB2520"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(property "Reference" "C1"
+		(at -4.277996 -6.51 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "ebced6b6-a6f3-43b2-9827-d9c40983ed16")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "MKP63"
+		(at -2.31 -6.41 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "851c6a7e-5a26-4425-b203-9f98edde50ee")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0.255 -0.56 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "97dbd606-ae18-4dea-9f20-caa75df19d0b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "Unpolarized capacitor"
+		(at 0.255 -0.56 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "f734217b-ae00-4ebd-acf5-76e91f42b819")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_poly
+		(pts
+			(xy -5.305 -7.509999) (xy 22.595 -7.51) (xy 22.595 7.49) (xy -5.305 7.49)
+		)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "3a7d0dc9-9f29-4729-9d50-9bac8f86a353")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0.4 -6.23 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "fa4ba52b-7d26-4408-9de5-016b0dba9bf4")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at -2.5 0)
+		(size 3 3)
+		(drill 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "40676c0f-d244-4476-86d3-f63bfe37d949")
+	)
+	(pad "2" thru_hole circle
+		(at 19.5 0)
+		(size 3 3)
+		(drill 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "641ce64c-c6bd-4f77-981c-a76c1cac9dc2")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/lib/Capacitor/Part1.STEP"
+		(offset
+			(xyz 22 -6 0.5)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -0)
+		)
+	)
+)

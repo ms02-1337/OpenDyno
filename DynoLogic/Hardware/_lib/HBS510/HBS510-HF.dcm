@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP HBS510-HF
+D Bridge Rectifier, VRRM=1000(V), IFSM=130(A), IF=5(A), VF=0.97(V), IR=5(uA)
+K
+F https://www.comchiptech.com/admin/files/product/QW-JBR18%20HBS502-HF%20Thru.%20HBS510-HF%20RevA.pdf
+$ENDCMP
+#
+#End Doc Library

@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP GBJ5010-BP
+D Bridge Rectifiers 50A GLASS PASSIVATED BRIDGE
+K
+F https://mccsemi.com/pdf/Products/GBJ50005~GBJ5010(GBJ).pdf
+$ENDCMP
+#
+#End Doc Library

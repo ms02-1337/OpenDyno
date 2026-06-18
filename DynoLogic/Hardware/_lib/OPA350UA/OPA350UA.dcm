@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP OPA350UA
+D High-Speed, Single-Supply, Rail-to-Rail Operational Amplifiers MicroAmplifier Series
+K
+F http://www.ti.com/lit/ds/symlink/opa350.pdf
+$ENDCMP
+#
+#End Doc Library

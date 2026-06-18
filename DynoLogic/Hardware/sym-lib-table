@@ -1,0 +1,8 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "ADS1256IDBR")(type "KiCad")(uri "${KIPRJMOD}/_lib/ADS1256IDBR/ADS1256IDBR.kicad_sym")(options "")(descr ""))
+  (lib (name "ADS1117-3.3")(type "KiCad")(uri "${KIPRJMOD}/_lib/AMS1117-3.3/ADS1117-3.3.kicad_sym")(options "")(descr ""))
+  (lib (name "OPA350UA")(type "KiCad")(uri "${KIPRJMOD}/_lib/OPA350UA/OPA350UA.kicad_sym")(options "")(descr ""))
+  (lib (name "ADR03ARZ")(type "KiCad")(uri "${KIPRJMOD}/_lib/ADR03A/ADR03ARZ.kicad_sym")(options "")(descr ""))
+  (lib (name "DynoLogic_v2")(type "KiCad")(uri "${KIPRJMOD}/_lib/DynoLogic_v2.kicad_sym")(options "")(descr ""))
+)

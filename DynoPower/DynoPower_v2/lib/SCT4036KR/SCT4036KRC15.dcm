@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP SCT4036KRC15
+D N-channel SiC power MOSFET, 1200V, 36m
+K
+F https://g.componentsearchengine.com/Datasheets/0/15868418.pdf
+$ENDCMP
+#
+#End Doc Library

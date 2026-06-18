@@ -1,0 +1,146 @@
+(footprint "Connector_2pin"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "39773-0002-3")
+	(tags "Connector")
+	(property "Reference" "J**"
+		(at 1.27 -0.25 0)
+		(layer "F.SilkS")
+		(uuid "47660dca-2a8e-437b-8b38-bdca953b7aff")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Value" "Connector_2pin"
+		(at 1.27 -0.25 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "fb8fabc2-9cdb-4544-ba83-53f312379c38")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "ef9b4992-24ec-4bbc-a944-a360807c02ee")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "342b9302-f60f-4635-bf4a-43dda413497e")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_rect
+		(start -1.5 -3.5)
+		(end 4.05 3)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "d2b9ea27-f758-4d2e-8b81-cd2e073bd341")
+	)
+	(fp_line
+		(start -1.5 -3.5)
+		(end 4.04 -3.5)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "42e3711b-da70-4bbf-a9b5-70141cddb13e")
+	)
+	(fp_line
+		(start -1.5 3)
+		(end -1.5 -3.5)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "9671d814-4a71-4c5f-a6d1-0d6f0b63e64f")
+	)
+	(fp_line
+		(start 4.04 -3.5)
+		(end 4.04 3)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "1c4a8b2d-b958-4cf8-b89b-4c2bb11f23a2")
+	)
+	(fp_line
+		(start 4.04 3)
+		(end -1.5 3)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "49762d85-5a03-451d-b25f-daa37334f6f4")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 1.27 -0.25 0)
+		(layer "F.Fab")
+		(uuid "a9d3cb47-2d42-45e3-9da4-dc4f52b1bf48")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at 0 0)
+		(size 1.65 1.65)
+		(drill 1.1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "d8afcc71-6162-4a01-a743-394fb52d3a1a")
+	)
+	(pad "2" thru_hole circle
+		(at 2.54 0)
+		(size 1.65 1.65)
+		(drill 1.1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "7f202fcf-8136-4097-b69e-296b0331b3b2")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/lib/2pinConnector/39773-0002.stp"
+		(offset
+			(xyz 1.269999962 0 -0.02999999888)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 0 -180)
+		)
+	)
+)

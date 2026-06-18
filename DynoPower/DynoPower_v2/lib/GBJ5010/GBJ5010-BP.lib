@@ -1,0 +1,25 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model GBJ5010-BP
+#/666926/1626007/2.50/4/2/Bridge Rectifier
+DEF GBJ5010-BP BR 0 30 Y Y 1 F N
+F0 "BR" 750 300 50 H V L CNN
+F1 "GBJ5010-BP" 750 200 50 H V L CNN
+F2 "GBJ_1" 750 100 50 H I L CNN
+F3 "https://mccsemi.com/pdf/Products/GBJ50005~GBJ5010(GBJ).pdf" 750 0 50 H I L CNN
+F4 "Bridge Rectifiers 50A GLASS PASSIVATED BRIDGE" 750 -100 50 H I L CNN "Description"
+F5 "" 750 -200 50 H I L CNN "Height"
+F6 "833-GBJ5010-BP" 750 -300 50 H I L CNN "Mouser Part Number"
+F7 "https://www.mouser.co.uk/ProductDetail/Micro-Commercial-Components-MCC/GBJ5010-BP?qs=y6ZabgHbY%252BzFa2%252BU%2Fz11CQ%3D%3D" 750 -400 50 H I L CNN "Mouser Price/Stock"
+F8 "MCC" 750 -500 50 H I L CNN "Manufacturer_Name"
+F9 "GBJ5010-BP" 750 -600 50 H I L CNN "Manufacturer_Part_Number"
+DRAW
+X + 1 0 0 200 R 50 50 0 0 P
+X ~_1 2 0 -100 200 R 50 50 0 0 P
+X ~_2 3 0 -200 200 R 50 50 0 0 P
+X - 4 0 -300 200 R 50 50 0 0 P
+P 5 0 1 6 200 100 700 100 700 -400 200 -400 200 100 N
+ENDDRAW
+ENDDEF
+#
+#End Library

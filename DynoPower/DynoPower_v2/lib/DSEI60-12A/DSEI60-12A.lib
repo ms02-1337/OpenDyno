@@ -1,0 +1,26 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model DSEI60-12A
+#/327545/1626007/2.50/2/3/Diode
+DEF DSEI60-12A D 0 30 Y Y 1 F N
+F0 "D" 450 200 50 H V L CNN
+F1 "DSEI60-12A" 450 100 50 H V L CNN
+F2 "TO1090P530X1600X2596-2P" 450 0 50 H I L CNN
+F3 "https://componentsearchengine.com/Datasheets/1/DSEI60-12A.pdf" 450 -100 50 H I L CNN
+F4 "Diode Fast Recovery 1200V 60A TO247AD IXYS DSEI60-12A, Switching Diode, 1200V 52A, 60ns, 2-Pin TO-247AD" 450 -200 50 H I L CNN "Description"
+F5 "5.3" 450 -300 50 H I L CNN "Height"
+F6 "747-DSEI60-12A" 450 -400 50 H I L CNN "Mouser Part Number"
+F7 "https://www.mouser.co.uk/ProductDetail/IXYS/DSEI60-12A?qs=t7yjd2JO%2FgQo8V6UzrVVxA%3D%3D" 450 -500 50 H I L CNN "Mouser Price/Stock"
+F8 "LITTELFUSE" 450 -600 50 H I L CNN "Manufacturer_Name"
+F9 "DSEI60-12A" 450 -700 50 H I L CNN "Manufacturer_Part_Number"
+DRAW
+X ~ 2 0 0 100 R 50 50 0 0 P
+X ~ 1 600 0 100 L 50 50 0 0 P
+P 2 0 1 6 200 100 200 -100 N
+P 2 0 1 6 100 0 200 0 N
+P 2 0 1 6 400 0 500 0 N
+P 4 0 1 10 200 0 400 100 400 -100 200 0 F
+ENDDRAW
+ENDDEF
+#
+#End Library

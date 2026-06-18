@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ADS1256IDBR
+D 24-bit, 30kSPS, 8-Ch Delta-Sigma ADC with PGA for Factory Automation and Process Control
+K
+F http://www.ti.com/lit/gpn/ads1256
+$ENDCMP
+#
+#End Doc Library

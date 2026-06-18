@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP DSEI60-12A
+D Diode Fast Recovery 1200V 60A TO247AD IXYS DSEI60-12A, Switching Diode, 1200V 52A, 60ns, 2-Pin TO-247AD
+K
+F https://componentsearchengine.com/Datasheets/1/DSEI60-12A.pdf
+$ENDCMP
+#
+#End Doc Library

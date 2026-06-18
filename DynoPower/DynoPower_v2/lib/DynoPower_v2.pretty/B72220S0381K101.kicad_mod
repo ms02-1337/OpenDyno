@@ -1,0 +1,165 @@
+(footprint "B72220S0381K101"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "B72220S0381K101-2")
+	(tags "Varistor")
+	(property "Reference" "RV**"
+		(at 5 1.25 0)
+		(layer "F.SilkS")
+		(uuid "1fec1014-eebc-4afe-8970-fe64298aa33a")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Value" "B72220S0381K101"
+		(at 5 1.25 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "8ae28c06-d23b-4f50-8bfb-fa3fe8ea00a9")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "120d2a38-765e-46f3-a186-383f44c7adb9")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0d454d86-42b9-46d8-917c-2bd51ffa692d")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole exclude_from_pos_files)
+	(fp_line
+		(start -6.75 -2.9)
+		(end -6.75 5.4)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "1c42508a-6fa4-4057-8f9b-7e9b1a753514")
+	)
+	(fp_line
+		(start -6.75 5.4)
+		(end 16.75 5.4)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "6fb97f0b-b296-4da7-8dde-e3166d5cf7c8")
+	)
+	(fp_line
+		(start -5.75 -1.9)
+		(end -5.75 4.4)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "82269a52-fc6d-4255-930a-db00b4623792")
+	)
+	(fp_line
+		(start -5.75 4.4)
+		(end 15.75 4.4)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "3ce5138b-be21-4e2c-af86-44a8baadd9ce")
+	)
+	(fp_line
+		(start 15.75 -1.9)
+		(end -5.75 -1.9)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "50608d65-f4c3-4549-8230-b63223ca8329")
+	)
+	(fp_line
+		(start 15.75 4.4)
+		(end 15.75 -1.9)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "31c0366a-ffd1-4892-9b28-b4c3f3dcfd88")
+	)
+	(fp_line
+		(start 16.75 -2.9)
+		(end -6.75 -2.9)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "496b1794-ea8f-4aa0-9c76-2d82d0eec95d")
+	)
+	(fp_line
+		(start 16.75 5.4)
+		(end 16.75 -2.9)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "6ec397f6-769c-41a0-9c2d-76aaf6a10136")
+	)
+	(pad "1" thru_hole rect
+		(at 0 0 90)
+		(size 1.875 1.875)
+		(drill 1.25)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(thermal_bridge_angle 45)
+		(uuid "25a7404e-d990-4483-a2bf-8d3fc99f3013")
+	)
+	(pad "2" thru_hole circle
+		(at 10 2.5 90)
+		(size 1.875 1.875)
+		(drill 1.25)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "68961b2e-b43c-439e-9f85-1e76a624bdc9")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/lib/B72220S0381K101/B72220S0381K101.stp"
+		(offset
+			(xyz 5.5 -1.2 15)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 2)
+		)
+	)
+)

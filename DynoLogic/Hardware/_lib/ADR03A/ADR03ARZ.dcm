@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ADR03ARZ
+D ADR03A 2.5V voltage reference SOIC
+K
+F https://datasheet.datasheetarchive.com/originals/distributors/Datasheets-SFU1/DSASFU10005341.pdf
+$ENDCMP
+#
+#End Doc Library

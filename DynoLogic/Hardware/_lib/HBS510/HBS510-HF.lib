@@ -1,0 +1,25 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model HBS510-HF
+#/17215642/1626007/2.50/4/3/Bridge Rectifier
+DEF HBS510-HF BR 0 30 Y Y 1 F N
+F0 "BR" 850 300 50 H V L CNN
+F1 "HBS510-HF" 850 200 50 H V L CNN
+F2 "HBS510HF" 850 100 50 H I L CNN
+F3 "https://www.comchiptech.com/admin/files/product/QW-JBR18%20HBS502-HF%20Thru.%20HBS510-HF%20RevA.pdf" 850 0 50 H I L CNN
+F4 "Bridge Rectifier, VRRM=1000(V), IFSM=130(A), IF=5(A), VF=0.97(V), IR=5(uA)" 850 -100 50 H I L CNN "Description"
+F5 "1.8" 850 -200 50 H I L CNN "Height"
+F6 "750-HBS510-HF" 850 -300 50 H I L CNN "Mouser Part Number"
+F7 "https://www.mouser.co.uk/ProductDetail/Comchip-Technology/HBS510-HF?qs=By6Nw2ByBD0Hqy%2FFG6O6cw%3D%3D" 850 -400 50 H I L CNN "Mouser Price/Stock"
+F8 "Comchip Technology" 850 -500 50 H I L CNN "Manufacturer_Name"
+F9 "HBS510-HF" 850 -600 50 H I L CNN "Manufacturer_Part_Number"
+DRAW
+X + 1 1000 0 200 L 50 50 0 0 P
+X ~_1 2 1000 -100 200 L 50 50 0 0 P
+X ~_2 3 0 -100 200 R 50 50 0 0 P
+X - 4 0 0 200 R 50 50 0 0 P
+P 5 0 1 6 200 100 800 100 800 -200 200 -200 200 100 N
+ENDDRAW
+ENDDEF
+#
+#End Library

@@ -1,0 +1,42 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model NGTB40N120FL3WG
+#/721697/1626007/2.50/3/2/Transistor IGBT
+DEF NGTB40N120FL3WG Q 0 30 Y Y 1 F N
+F0 "Q" 450 100 50 H V L CNN
+F1 "NGTB40N120FL3WG" 450 0 50 H V L CNN
+F2 "TO545P530X1588X2566-3P" 450 -100 50 H I L CNN
+F3 "https://componentsearchengine.com/Datasheets/1/NGTB40N120FL3WG.pdf" 450 -200 50 H I L CNN
+F4 "Extremely Efficient Trench with Ultra Field Stop Technology; TJmax = 175C; Soft Fast Reverse Recovery Diode; Optimized for High Speed Switching; These are PbFree Devices" 450 -300 50 H I L CNN "Description"
+F5 "5.3" 450 -400 50 H I L CNN "Height"
+F6 "863-NGTB40N120FL3WG" 450 -500 50 H I L CNN "Mouser Part Number"
+F7 "https://www.mouser.com/Search/Refine.aspx?Keyword=863-NGTB40N120FL3WG" 450 -600 50 H I L CNN "Mouser Price/Stock"
+F8 "onsemi" 450 -700 50 H I L CNN "Manufacturer_Name"
+F9 "NGTB40N120FL3WG" 450 -800 50 H I L CNN "Manufacturer_Part_Number"
+DRAW
+X ~ 1 0 0 100 R 50 50 0 0 P
+X ~ 2 300 300 100 D 50 50 0 0 P
+X ~ 3 300 -200 100 U 50 50 0 0 P
+P 2 0 1 6 300 -40 300 -100 N
+P 2 0 1 6 300 140 300 200 N
+P 3 0 1 6 100 0 200 0 200 100 N
+P 2 0 1 6 230 -16 230 16 N
+P 2 0 1 6 320 70 360 70 N
+P 2 0 1 6 230 0 300 -40 N
+P 2 0 1 6 300 140 230 100 N
+P 2 0 1 6 230 50 300 10 N
+P 3 0 1 6 340 70 340 160 300 160 N
+P 3 0 1 6 340 30 340 -60 300 -60 N
+P 2 0 1 6 230 34 230 66 N
+P 2 0 1 6 230 86 230 118 N
+P 2 0 1 6 230 84 230 116 N
+C 250 50 150 0 1 10 N
+C 300 160 10 0 1 15 N
+C 300 -60 10 0 1 15 N
+P 4 0 1 10 340 70 320 30 360 30 340 70 F
+P 4 0 1 10 260 -30 270 -10 300 -40 260 -30 F
+P 4 0 1 10 270 110 260 130 230 100 270 110 F
+ENDDRAW
+ENDDEF
+#
+#End Library

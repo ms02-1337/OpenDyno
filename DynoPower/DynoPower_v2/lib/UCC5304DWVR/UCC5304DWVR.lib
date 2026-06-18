@@ -1,0 +1,29 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model UCC5304DWVR
+#/12034762/1626007/2.50/8/3/Integrated Circuit
+DEF UCC5304DWVR IC 0 30 Y Y 1 F N
+F0 "IC" 1150 300 50 H V L CNN
+F1 "UCC5304DWVR" 1150 200 50 H V L CNN
+F2 "SOIC127P1150X280-8N" 1150 100 50 H I L CNN
+F3 "https://www.ti.com/lit/gpn/UCC5304" 1150 0 50 H I L CNN
+F4 "Gate Drivers 4-A source, 6-A sink single-channel reinforced isolation gate driver with high noise immunity 8-SOIC -40 to 125" 1150 -100 50 H I L CNN "Description"
+F5 "2.8" 1150 -200 50 H I L CNN "Height"
+F6 "595-UCC5304DWVR" 1150 -300 50 H I L CNN "Mouser Part Number"
+F7 "https://www.mouser.co.uk/ProductDetail/Texas-Instruments/UCC5304DWVR?qs=vmHwEFxEFR%252BJ%252B3hHq6l1mw%3D%3D" 1150 -400 50 H I L CNN "Mouser Price/Stock"
+F8 "Texas Instruments" 1150 -500 50 H I L CNN "Manufacturer_Name"
+F9 "UCC5304DWVR" 1150 -600 50 H I L CNN "Manufacturer_Part_Number"
+DRAW
+X IN 1 0 0 200 R 50 50 0 0 P
+X VCCI_1 2 0 -100 200 R 50 50 0 0 P
+X VCCI_2 3 0 -200 200 R 50 50 0 0 P
+X GND 4 0 -300 200 R 50 50 0 0 P
+X VDD 8 1300 0 200 L 50 50 0 0 P
+X OUT 7 1300 -100 200 L 50 50 0 0 P
+X VSS_2 6 1300 -200 200 L 50 50 0 0 P
+X VSS_1 5 1300 -300 200 L 50 50 0 0 P
+P 5 0 1 6 200 100 1100 100 1100 -400 200 -400 200 100 N
+ENDDRAW
+ENDDEF
+#
+#End Library
