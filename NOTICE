@@ -1,0 +1,21 @@
+OpenDyno
+Copyright 2025–2026 Adrian Marcos and contributors
+
+This product includes software and hardware designs developed by the OpenDyno project.
+
+Third-party components and their licenses are listed below:
+
+- QuickPID (https://github.com/Dlloydev/QuickPID) – MIT License
+- ACAN_T4 (https://github.com/pierremolinaro/acan-t4) – MIT License
+- Flask (https://palletsprojects.com/p/flask/) – BSD 3-Clause
+- Flask-SocketIO (https://flask-socketio.readthedocs.io) – MIT License
+- python-can (https://python-can.readthedocs.io) – LGPL-3.0
+- uPlot (https://github.com/leeoniya/uPlot) – MIT License
+- Bootstrap 5 (https://getbootstrap.com) – MIT License
+- Various PlatformIO and KiCad libraries – see respective repositories
+
+All original OpenDyno code and designs are released under the OpenDyno
+Custom Non-Commercial License (see LICENSE file).
+
+For any questions regarding licensing or attribution, please open an issue
+on the project repository.

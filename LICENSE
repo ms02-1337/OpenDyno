@@ -1,0 +1,49 @@
+OpenDyno Custom Non-Commercial License
+Version 1.0 – June 2026
+
+Copyright (c) 2025–2026 Adrian Marcos and contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), and to
+any hardware design files, schematics, PCB layouts, bill of materials, and
+3D models (collectively the "Hardware") to deal in the Software and Hardware
+without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the
+Software and Hardware, subject to the following conditions:
+
+1. Attribution
+   You must give appropriate credit, provide a link to the license, and
+   indicate if changes were made. You may do so in any reasonable manner,
+   but not in any way that suggests the licensor endorses you or your use.
+
+2. Non-Commercial Use
+   You may NOT use the Software or Hardware for any commercial purpose or
+   in any activity that generates revenue, directly or indirectly. This
+   includes, but is not limited to, selling products, offering paid services,
+   or using the Software/Hardware as part of a commercial product or service.
+
+3. Share-Alike & Publication Requirement
+   If you modify the Software or Hardware, or create derivative works based
+   upon them, you MUST publish your modifications or derivative works under
+   the same license terms, making the source files publicly available.
+
+4. No Warranty
+   THE SOFTWARE AND HARDWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+   KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE OR HARDWARE.
+
+5. Termination
+   This license automatically terminates if you fail to comply with any of
+   its terms. Upon termination, you must cease all use and distribution of
+   the Software and Hardware and destroy all copies in your possession.
+
+For the avoidance of doubt, this license does NOT grant any patent rights.
+
+---
+
+This license is inspired by the Commons Clause but is a custom, standalone
+license. It is not compatible with OSI-approved open source licenses.
